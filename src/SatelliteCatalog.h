@@ -32,16 +32,17 @@ public:
 	};
 
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-	explicit SatelliteCatalog(string pathToCatalogFile);
+	explicit SatelliteCatalog(string pathToDataDirectory);
 
 	/* ========== PUBLIC ACCESSORS ========== */
 	const CatalogEntry& getCatalogEntry(const int &catNum);
-	int count() const;
+	[[nodiscard]] int count() const;
 
 	/* ========== PUBLIC MUTATORS ========== */
 
 private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
+	string _directory;
 	string _pathToCatalogFile;
 	map<int, CatalogEntry> _catalog;
 	int _count;
@@ -53,4 +54,5 @@ private:
 	static string _removeQuotes(string &str);
 	static double cellToDouble(string &cell);
 	static int cellToInt(string &cell);
+	static string selectCatalogFile(string &directoryPath);
 };

@@ -3,11 +3,15 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <filesystem>
 #include "SatelliteCatalog.h"
 
+namespace fs = filesystem;
+
 /* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-SatelliteCatalog::SatelliteCatalog(string pathToCatalogFile) : _pathToCatalogFile(std::move(pathToCatalogFile)), _count(0)
+SatelliteCatalog::SatelliteCatalog(string pathToDataDirectory) : _directory(std::move(pathToDataDirectory)), _count(0)
 {
+	_pathToCatalogFile = selectCatalogFile(_directory);
 	_loadCatalog();
 }
 
@@ -22,9 +26,15 @@ void SatelliteCatalog::_loadCatalog()
 		if (!catalogFile.is_open())
 			throw runtime_error("File could not be opened! Catalog data was not imported!");
 
-		// Read the file line by line
+		// Require that the first link contain the appropriate column titles
 		string line, cell;
 		getline(catalogFile, line);
+		auto correctLineZero = "OBJECT_ID,OBJECT_NAME,NORAD_CAT_ID,COUNTRY,PERIOD,INCLINATION,APOGEE,PERIGEE,RCS_SIZE,RCSVALUE,LAUNCH,COMMENT";
+
+		if (line != correctLineZero)
+			throw runtime_error("The CSV file does not contain the columns that are expected by this process! The catalog could not be imported!");
+
+		// Read the file line by line
 		while (getline(catalogFile, line))
 		{
 			// Create a string stream and split it by a ',' delimiter
@@ -88,6 +98,8 @@ void SatelliteCatalog::_loadCatalog()
 	}
 }
 
+
+/* ========== PRIVATE STATIC HELPER FUNCTIONS ========== */
 string SatelliteCatalog::_removeQuotes(string &str)
 {
 	return str.substr(1, str.size() - 2);
@@ -105,6 +117,43 @@ int SatelliteCatalog::cellToInt(string &cell)
 		return 0;
 	else
 		return stoi(cell);
+}
+string SatelliteCatalog::selectCatalogFile(string &directoryPath)
+{
+	try {
+		if (!fs::exists(directoryPath) || !fs::is_directory(directoryPath))
+		{
+			throw std::runtime_error("Directory does not exist or is not accessible.");
+		}
+
+		string newestCSV;
+		filesystem::file_time_type newestTime;
+
+		for (const auto& entry : fs::directory_iterator(directoryPath))
+		{
+			if (entry.is_regular_file() && entry.path().extension() == ".csv") {
+				auto currentFileTime = fs::last_write_time(entry);
+
+				if (newestCSV.empty() || newestTime < currentFileTime)
+				{
+					newestTime = currentFileTime;
+					newestCSV = entry.path().string();
+				}
+			}
+		}
+
+		if (newestCSV.empty())
+		{
+			throw runtime_error("No CSV files found in the directory.");
+		}
+
+		return newestCSV;
+	}
+	catch (const exception& error)
+	{
+		cerr << "Error: " << error.what() << endl;
+		return "";
+	}
 }
 
 
