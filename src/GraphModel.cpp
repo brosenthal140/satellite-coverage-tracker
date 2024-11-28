@@ -1,4 +1,6 @@
 #include <vector>
+#include <set>
+#include <limits>
 #include "GraphModel.h"
 #include "Utility.h"
 
@@ -50,13 +52,13 @@ const GraphModel::Vertex& GraphModel::_getNearestWaypoint(const CoordGeodetic &p
 	auto latLowerBound = pos.latitude - _wpThreshold;
 	auto latUpperBound = pos.latitude + _wpThreshold;
 	auto longLowerBound = pos.longitude - _wpThreshold;
-	auto longUpperBound = pos.longitude - _wpThreshold;
+	auto longUpperBound = pos.longitude + _wpThreshold;
 
 	auto lowerBoundIter = _wpLatMap.lower_bound(latLowerBound);
 	auto upperBoundIter = _wpLatMap.upper_bound(latUpperBound);
 
 	// Iterate through the _wpLatMap to find possible waypoints
-	vector<int> wpCandidates;
+	set<int> wpCandidates;
 	for (auto iter = lowerBoundIter; iter != upperBoundIter; ++iter)
 	{
 		// Check to see if the waypoint's longitude is in range
@@ -64,7 +66,7 @@ const GraphModel::Vertex& GraphModel::_getNearestWaypoint(const CoordGeodetic &p
 		auto wp = _waypoints[wpIndex];
 
 		if (wp.position.longitude >= longLowerBound && wp.position.longitude <= longUpperBound)
-			wpCandidates.emplace_back(wpIndex);
+			wpCandidates.insert(wpIndex);
 	}
 
 
@@ -78,11 +80,11 @@ const GraphModel::Vertex& GraphModel::_getNearestWaypoint(const CoordGeodetic &p
 		auto wp = _waypoints[wpIndex];
 
 		if (wp.position.latitude >= latLowerBound && wp.position.latitude <= latUpperBound)
-			wpCandidates.emplace_back(wpIndex);
+			wpCandidates.insert(wpIndex);
 	}
 
 	// If a there are still waypoint candidates, get the nearest waypoint
-	double minDist, testDist;
+	double minDist = numeric_limits<double>::max(), testDist;
 	int selectedIndex = -1;
 	for (const auto &wp : wpCandidates)
 	{
