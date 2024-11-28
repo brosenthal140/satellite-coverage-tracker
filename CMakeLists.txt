@@ -22,28 +22,43 @@ add_subdirectory(lib/sattrack)
 add_executable(main src/main.cpp
         src/TLEParser.cpp
         src/TLEParser.h
+        src/SatelliteCoverageTracker.cpp
+        src/SatelliteCoverageTracker.h
+        src/GraphModel.cpp
+        src/GraphModel.h
+        src/LinearModel.cpp
+        src/LinearModel.h
+        src/SatelliteCatalog.cpp
+        src/SatelliteCatalog.h
+        src/Utility.cpp
+        src/Utility.h)
+
+# Link the libsgp4 library to the main executable
+target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/lib/libsgp4)
+target_link_libraries(main PRIVATE sgp4)
+
+# Add the tests executable
+add_executable(tests tests/libsgp4-tests.cpp
+        tests/TLEParser-tests.cpp
+        tests/Graph-tests.cpp
+        tests/LinearModel-tests.cpp
+        tests/SatelliteCatalog-tests.cpp
         src/TLEParser.cpp
         src/TLEParser.h
         src/SatelliteCoverageTracker.cpp
         src/SatelliteCoverageTracker.h
         src/GraphModel.cpp
-        src/GraphModel.cpp
         src/GraphModel.h
         src/LinearModel.cpp
-        src/LinearModel.h)
-
-# Link the libsgp4 library to the main executable
-target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/lib/libsgp4)
-
-# Add the tests executable
-add_executable(tests tests/libsgpt4-tests.cpp
-        tests/TLEParser-tests.cpp
-        tests/Graph-tests.cpp
-        tests/LinearModel-tests.cpp)
+        src/LinearModel.h
+        src/SatelliteCatalog.cpp
+        src/SatelliteCatalog.h
+        src/Utility.cpp
+        src/Utility.h)
 
 # Link the libsgp4 library to the tests executable
 target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/lib/libsgp4)
-target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(tests PRIVATE sgp4 Catch2::Catch2WithMain)
 
 include(Catch)
 catch_discover_tests(tests)
