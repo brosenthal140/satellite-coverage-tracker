@@ -1,51 +1,99 @@
-#include <vector>
-#include <set>
 #include <limits>
 #include "GraphModel.h"
 #include "Utility.h"
 
 /* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-GraphModel::GraphModel(string &directory, double &threshold) : _dataDirectory(directory), _wpThreshold(threshold), _wpCount(0) {}
+GraphModel::GraphModel(string &directory, double &threshold) : _dataDirectory(directory), _wpThreshold(threshold), _wpCount(0), _vertexCount(0) {}
 
 /* ========== PUBLIC MUTATORS ========== */
-void GraphModel::insertEdge(Tle &tle)
+/**
+ * Processes a Tle object, creates a vertex, and inserts it into the graph. This function does not insert waypoints (that is automatic)
+ * @param tle the Tle object used to determine the position
+ */
+void GraphModel::insertVertex(Tle &tle)
 {
-	_insertEdge(tle);
+
 }
 
 /* ========== PUBLIC ACCESSORS ========== */
+/**
+ * Returns the current number of waypoints in the graph
+ * @return the number of waypoints
+ */
 int GraphModel::waypointCount() const
 {
 	return _wpCount;
 }
 
 /* ========== PUBLIC TEST METHODS ========== */
-GraphModel::Vertex GraphModel::testGetNearestWaypoint(const CoordGeodetic &pos)
+/**
+ * A test function used to test the _getNearestWaypoint() function
+ * @param pos the position to search for
+ * @return a reference to the nearest waypoint
+ */
+const GraphModel::Vertex& GraphModel::testGetNearestWaypoint(const CoordGeodetic &pos)
 {
 	return _getNearestWaypoint(pos);
 }
 
 
 /* ========== PRIVATE INSERTION METHODS ========== */
-// This function should only be called from the _getNearestWaypoint() if there is not a waypoint within the threshold
+/**
+ * Increments _vertexCount and returns the new value as the next index
+ * @return an int as the next vertex index
+ */
+int GraphModel::_getNextVertexIndex()
+{
+	return _vertexCount++;
+}
+
+/**
+ * Creates a new vertex and inserts it into the graph
+ * @param pos
+ * @param isWaypoint
+ * @return the index of the newly inserted index
+ */
+int GraphModel::_insertVertex(const CoordGeodetic &pos, bool isWaypoint)
+{
+	Vertex vertex = { isWaypoint, pos };
+	int index = _getNextVertexIndex();
+	_vertices[index] = vertex;
+
+	return index;
+}
+
+/**
+ * Creates a new vertex and as a waypoint
+ * @param pos the position of the vertex to be inserted as a waypoint
+ * @return a reference to the vertex that was just created
+ */
 const GraphModel::Vertex& GraphModel::_insertWaypoint(const CoordGeodetic &pos)
 {
-	Vertex vertex = { pos };
-	int wpIndex = _wpCount;
-	_waypoints[wpIndex] = vertex;
+	int wpIndex = _insertVertex(pos, true);
 	_wpCount++;
 
 	_wpLatMap[pos.latitude] = wpIndex;
 	_wpLongMap[pos.longitude] = wpIndex;
 
-	return _waypoints[wpIndex];
+	return _vertices[wpIndex];
 }
-void GraphModel::_insertEdge( Tle &tle)
+
+/**
+ * Inserts an edge from one index to another
+ * @param from the index of the source
+ * @param to the index of the destination
+ */
+void GraphModel::_insertEdge(int &from, int &to)
 {
 
 }
 
 /* ========== PRIVATE SEARCH METHODS ========== */
+/**
+ * Searches for the closest waypoint relative to position and a waypoint threshold
+ * @param pos the position to search for
+ * @return a reference to the waypoint
+ */
 const GraphModel::Vertex& GraphModel::_getNearestWaypoint(const CoordGeodetic &pos)
 {
 	// First, check the waypoint latitude map to determine if there is a waypoint candidate with a latitude within the threshold
@@ -63,7 +111,7 @@ const GraphModel::Vertex& GraphModel::_getNearestWaypoint(const CoordGeodetic &p
 	{
 		// Check to see if the waypoint's longitude is in range
 		auto wpIndex = iter->second;
-		auto wp = _waypoints[wpIndex];
+		auto wp = _vertices[wpIndex];
 
 		if (wp.position.longitude >= longLowerBound && wp.position.longitude <= longUpperBound)
 			wpCandidates.insert(wpIndex);
@@ -77,7 +125,7 @@ const GraphModel::Vertex& GraphModel::_getNearestWaypoint(const CoordGeodetic &p
 	{
 		// Check to see if the waypoint's longitude is in range
 		auto wpIndex = iter->second;
-		auto wp = _waypoints[wpIndex];
+		auto wp = _vertices[wpIndex];
 
 		if (wp.position.latitude >= latLowerBound && wp.position.latitude <= latUpperBound)
 			wpCandidates.insert(wpIndex);
@@ -88,7 +136,7 @@ const GraphModel::Vertex& GraphModel::_getNearestWaypoint(const CoordGeodetic &p
 	int selectedIndex = -1;
 	for (const auto &wp : wpCandidates)
 	{
-		testDist = Utility::getDistance(pos, _waypoints[wp].position);
+		testDist = Utility::getDistance(pos, _vertices[wp].position);
 
 		if (testDist < minDist)
 		{
@@ -101,5 +149,5 @@ const GraphModel::Vertex& GraphModel::_getNearestWaypoint(const CoordGeodetic &p
 	if (selectedIndex == -1)
 		return _insertWaypoint(pos);
 	else
-		return _waypoints[selectedIndex];
+		return _vertices[selectedIndex];
 }
