@@ -91,6 +91,19 @@ public:
         return *this;
     }
 
+	/**
+	 * Equality operator
+	 * @param[in] rhs object to compare the invoking object to
+	 */
+	bool operator==(const CoordGeodetic& rhs)
+	{
+		auto latAreEqual = this->latitude == rhs.latitude;
+		auto longAreEqual = this->longitude == rhs.longitude;
+		auto altAreEqual = this->altitude == rhs.altitude;
+
+		return latAreEqual && longAreEqual && altAreEqual;
+	}
+
     /**
      * Dump this object to a string
      * @returns string
