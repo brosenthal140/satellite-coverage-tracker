@@ -29,7 +29,9 @@ add_executable(main src/main.cpp
         src/LinearModel.cpp
         src/LinearModel.h
         src/SatelliteCatalog.cpp
-        src/SatelliteCatalog.h)
+        src/SatelliteCatalog.h
+        src/Utility.cpp
+        src/Utility.h)
 
 # Link the libsgp4 library to the main executable
 target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/lib/libsgp4)
@@ -41,8 +43,18 @@ add_executable(tests tests/libsgp4-tests.cpp
         tests/Graph-tests.cpp
         tests/LinearModel-tests.cpp
         tests/SatelliteCatalog-tests.cpp
+        src/TLEParser.cpp
+        src/TLEParser.h
+        src/SatelliteCoverageTracker.cpp
+        src/SatelliteCoverageTracker.h
+        src/GraphModel.cpp
+        src/GraphModel.h
+        src/LinearModel.cpp
+        src/LinearModel.h
         src/SatelliteCatalog.cpp
-        src/SatelliteCatalog.h)
+        src/SatelliteCatalog.h
+        src/Utility.cpp
+        src/Utility.h)
 
 # Link the libsgp4 library to the tests executable
 target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/lib/libsgp4)
