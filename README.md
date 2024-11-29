@@ -4,11 +4,11 @@ COP3530 Data Structures &amp; Algorithm - Project 3
 
 **Group Name:** The Orbital Police
 
-**Group Members:** Kaminari Austin, Ryan McGlinn, Brandon Rosenthal
+**Group Members:** Kamarii Austin, Ryan McGlinn, Brandon Rosenthal
 
 # Class Documentation
 ***
-THe following section provides a summary of each custom class used in the project
+The following section provides a summary of each custom class used in the project
 
 ## SatelliteCoverageTracker
 
