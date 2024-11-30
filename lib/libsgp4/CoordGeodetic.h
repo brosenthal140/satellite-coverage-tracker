@@ -95,7 +95,7 @@ public:
 	 * Equality operator
 	 * @param[in] rhs object to compare the invoking object to
 	 */
-	bool operator==(const CoordGeodetic& rhs)
+	bool operator==(const CoordGeodetic& rhs) const
 	{
 		auto latAreEqual = this->latitude == rhs.latitude;
 		auto longAreEqual = this->longitude == rhs.longitude;
