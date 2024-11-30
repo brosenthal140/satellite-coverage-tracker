@@ -18,6 +18,9 @@ The following section provides a summary of each custom class used in the projec
 
 ## LinearModel Class
 
+## Utility Class
+- `getDistance()` - computes the haversine distance between two geodetic coordinate positions
+
 # Library Documentation
 ***
 The following section describes external libraries that are used in this project

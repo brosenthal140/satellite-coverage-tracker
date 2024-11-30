@@ -54,7 +54,8 @@ add_executable(tests tests/libsgp4-tests.cpp
         src/SatelliteCatalog.cpp
         src/SatelliteCatalog.h
         src/Utility.cpp
-        src/Utility.h)
+        src/Utility.h
+        tests/Utility-tests.cpp)
 
 # Link the libsgp4 library to the tests executable
 target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/lib/libsgp4)
