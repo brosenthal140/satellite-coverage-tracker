@@ -15,6 +15,16 @@ The following section provides a summary of each custom class used in the projec
 ## TLEParser Class
 
 ## GraphModel Class
+***
+### Construction
+- `GraphModel()` - constructor that takes in a path to the data directory and a waypoint separation threshold
+
+### Mutators
+- `insertVertex()` - takes in a Tle object and inserts a vertex
+
+### Accessors
+- `getVertex()` - returns a reference to a vertex object based on the index passed to the function
+- `getWaypointEdges()` - returns a reference to a vector containing the edges for a waypoint whose index matches the index passed to the function
 
 ## LinearModel Class
 
