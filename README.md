@@ -32,9 +32,12 @@ This is a template class which both the LinearModel and GraphModel classes inher
 - `GraphModel()` - constructor that takes in a path to the data directory and a waypoint separation threshold
 
 ### Mutators
+- `import()` - Performs the import process for all .tle files found in the data directory
+- `insert()` - Inserts a single data point into the data structure
 - `insertVertex()` - takes in a Tle object and inserts a vertex
 
 ### Accessors
+- `search()` - performs a search of the data structure to find datapoint that are in range relative to a position
 - `getVertex()` - returns a reference to a vertex object based on the index passed to the function
 - `getWaypointEdges()` - returns a reference to a vector containing the edges for a waypoint whose index matches the index passed to the function
 

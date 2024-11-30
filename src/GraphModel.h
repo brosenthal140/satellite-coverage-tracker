@@ -5,11 +5,12 @@
 #include <vector>
 #include <map>
 #include "SGP4.h"
+#include "DataModel.h"
 
 using namespace std;
 using namespace libsgp4;
 
-class GraphModel {
+class GraphModel : public DataModel {
 public:
 	/* ========== NESTED STRUCTS & ENUMS ========== */
 	struct Vertex {
@@ -29,9 +30,12 @@ public:
 	GraphModel(string &directory, const double &sepThresh);
 
 	/* ========== PUBLIC MUTATORS ========== */
+	void import() override;
+	void insert(const Tle &tle) override;
 	void insertVertex(Tle &tle);
 
 	/* ========== PUBLIC ACCESSORS ========== */
+	vector<int> search(const CoordGeodetic &position, const double &radius) override;
 	const Vertex& getVertex(const int &index);
 	const vector<Edge>& getWaypointEdges(const int &index);
 

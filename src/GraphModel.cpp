@@ -25,19 +25,47 @@ bool GraphModel::Vertex::operator==(const Vertex &rhs) const
 /* ============== GraphModel CLASS ============== */
 /* ---------------------------------------------- */
 /* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-GraphModel::GraphModel(string &directory, const double &sepThresh) : _dataDirectory(directory), _wpSeparation(sepThresh), _wpCount(0), _vertexCount(0) {}
+GraphModel::GraphModel(string &directory, const double &sepThresh) : _dataDirectory(directory), _wpSeparation(sepThresh), _wpCount(0), _vertexCount(0), DataModel(directory) {}
 
 /* ========== PUBLIC MUTATORS ========== */
+/**
+ * Performs the import process of the data files found in the data directory
+ */
+void GraphModel::import()
+{
+	// TODO: Implement the import() function for the GraphModel class
+}
+
+/**
+ * Inserts a single datapoint into the data structure
+ * @param tle the Tle object that defines the datapoint to insert
+ */
+void GraphModel::insert(const Tle &tle)
+{
+	// TODO: Implement the insert() function for the GraphModel class
+}
+
 /**
  * Processes a Tle object, creates a vertex, and inserts it into the graph. This function does not insert waypoints (that is automatic)
  * @param tle the Tle object used to determine the position
  */
 void GraphModel::insertVertex(Tle &tle)
 {
-	// TODO: implement insertVertex() function
+	// TODO: implement insertVertex() function for the GraphModel class
 }
 
 /* ========== PUBLIC ACCESSORS ========== */
+/**
+ * Performs a search of the data to return the catalog number of satellites that are within the radius of the position
+ * @param position the position used to check for satellites
+ * @param radius the range used to determine if a satellite is in range
+ * @return a vector containing the unique catalog numbers of the satellites that are in range
+ */
+vector<int> GraphModel::search(const CoordGeodetic &position, const double &radius)
+{
+	// TODO: Implement search() function
+}
+
 /**
  * Gets a vertex by index by index from the graph
  * @param index the index of the vertex to be returned
