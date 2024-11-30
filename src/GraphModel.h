@@ -32,7 +32,6 @@ public:
 	/* ========== PUBLIC MUTATORS ========== */
 	void import() override;
 	void insert(const Tle &tle) override;
-	void insertVertex(Tle &tle);
 
 	/* ========== PUBLIC ACCESSORS ========== */
 	vector<int> search(const CoordGeodetic &position, const double &radius) override;
@@ -48,6 +47,7 @@ private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
 	string _dataDirectory;
 
+	map<int, const Tle&> _observations;
 	unordered_set<int> _indices;
 	map<int, Vertex> _vertices;
 	map<int, vector<Edge>> _vertexAdjList;

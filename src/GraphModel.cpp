@@ -1,5 +1,6 @@
 #include <limits>
 #include "GraphModel.h"
+#include "TLEParser.h"
 #include "Utility.h"
 
 /* ========== NESTED STRUCTS & ENUMS ========== */
@@ -42,17 +43,16 @@ void GraphModel::import()
  */
 void GraphModel::insert(const Tle &tle)
 {
-	// TODO: Implement the insert() function for the GraphModel class
+	// Get the position for the Tle passed to the function
+	auto pos = TLEParser::getCoordGeodetic(tle);
+
+	// Insert the observation into the graph
+	auto index = _insertVertex(pos, false);
+
+	// Update the observations map to associate the vertex number with the Tle
+	_observations.insert({index, tle});
 }
 
-/**
- * Processes a Tle object, creates a vertex, and inserts it into the graph. This function does not insert waypoints (that is automatic)
- * @param tle the Tle object used to determine the position
- */
-void GraphModel::insertVertex(Tle &tle)
-{
-	// TODO: implement insertVertex() function for the GraphModel class
-}
 
 /* ========== PUBLIC ACCESSORS ========== */
 /**

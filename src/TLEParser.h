@@ -20,6 +20,8 @@ public:
 	static Tle parse(const string &tleString);
 	static Tle parse(const string &line1, const string &line2);
 	static Tle parse(const string &line1, const string &line2, const string &line3);
+
+	static CoordGeodetic getCoordGeodetic(const Tle &tle);
 	static CoordGeodetic getCoordGeodetic(const string &line1, const string &line2, const string &line3);
 	static CoordGeodetic getCoordGeodetic(const string &line1, const string &line2);
 };
