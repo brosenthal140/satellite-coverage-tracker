@@ -11,8 +11,9 @@ using namespace libsgp4;
 
 class GraphModel {
 public:
-	/* ========== PUBLIC STRUCTS & ENUMS ========== */
+	/* ========== NESTED STRUCTS & ENUMS ========== */
 	struct Vertex {
+		int index;
 		bool isWaypoint;
 		CoordGeodetic position;
 
@@ -31,16 +32,19 @@ public:
 	void insertVertex(Tle &tle);
 
 	/* ========== PUBLIC ACCESSORS ========== */
-	[[nodiscard]] int waypointCount() const;
+	const Vertex& getVertex(const int &index);
+	const vector<Edge>& getWaypointEdges(const int &index);
 
 	/* ========== PUBLIC TEST METHODS ========== */
-	static const Vertex& testGetNearestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint);
-	static const vector<Edge> testConnectWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos);
+	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint);
+	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint);
+	static bool testConnectWaypoint(string &dataDirectory, const double &wpSepThresh, const vector<CoordGeodetic> &positions, const Vertex &waypoint, const vector<Edge> &refEdges);
 
 private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
 	string _dataDirectory;
 
+	unordered_set<int> _indices;
 	map<int, Vertex> _vertices;
 	map<int, vector<Edge>> _vertexAdjList;
 	int _vertexCount;
@@ -61,7 +65,9 @@ private:
 	void _connectWaypoint(const int &index);
 
 	/* ========== PRIVATE SEARCH METHODS ========== */
-	const Vertex& _getNearestWaypoint(const CoordGeodetic &pos);
-	unordered_set<int> _getWaypointsInRange(const int &sourceIndex, const double &range);
+	static int _getIndexWithMinimumDistance(map<int, double> &distances);
+	map<int, double> _dijkstra(const CoordGeodetic &pos, const map<int, vector<Edge>> &graph);
+	int _findNearestVertex(const CoordGeodetic &pos);
+	int _findNearestWaypoint(const CoordGeodetic &pos);
+	unordered_set<int> _findVerticesWithinRange(const CoordGeodetic &pos, const double &range);
 };
-

@@ -1,9 +1,8 @@
 #include <limits>
-#include <queue>
 #include "GraphModel.h"
 #include "Utility.h"
 
-/* ========== PUBLIC STRUCTS & ENUMS ========== */
+/* ========== NESTED STRUCTS & ENUMS ========== */
 /* -------------------------------------------- */
 /* ============== Vertex STRUCT =============== */
 /* ============= PUBLIC OPERATORS ============= */
@@ -22,7 +21,9 @@ bool GraphModel::Vertex::operator==(const Vertex &rhs) const
 		return false;
 }
 
+
 /* ============== GraphModel CLASS ============== */
+/* ---------------------------------------------- */
 /* ========== CONSTRUCTORS/DESTRUCTORS ========== */
 GraphModel::GraphModel(string &directory, const double &sepThresh) : _dataDirectory(directory), _wpSeparation(sepThresh), _wpCount(0), _vertexCount(0) {}
 
@@ -38,34 +39,95 @@ void GraphModel::insertVertex(Tle &tle)
 
 /* ========== PUBLIC ACCESSORS ========== */
 /**
- * Returns the current number of waypoints in the graph
- * @return the number of waypoints
+ * Gets a vertex by index by index from the graph
+ * @param index the index of the vertex to be returned
+ * @return a reference to the Vertex matching the index passes to the function
  */
-int GraphModel::waypointCount() const
+const GraphModel::Vertex& GraphModel::getVertex(const int &index)
 {
-	return _wpCount;
+	return _vertices[index];
+}
+
+/**
+ * Gets the edges for a given waypoint index
+ * @param index the index of the waypoint whose edges should be returned
+ * @return a reference to a vector of edges
+ */
+const vector<GraphModel::Edge>& GraphModel::getWaypointEdges(const int &index)
+{
+	return _wpAdjList[index];
 }
 
 /* ========== PUBLIC TEST METHODS ========== */
 /**
  * A test function used to test the _getNearestWaypoint() function
- * @param pos the position to search for
- * @return a reference to the nearest waypoint
+ * @param dataDirectory the path to the data source for the GraphModel
+ * @param wpSepThresh the threshold that causes a new waypoint to be generated
+ * @param pos the position used to check for a waypoint
+ * @param refWaypoint the required value that must be returned for the test to pass
+ * @return a boolean value indicating if the test passes
  */
-const GraphModel::Vertex& GraphModel::testGetNearestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint)
+bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint)
 {
 	GraphModel graph(dataDirectory, wpSepThresh);
-	auto waypoint = graph._getNearestWaypoint(pos);
+	auto wpIndex = graph._findNearestWaypoint(pos);
+	auto waypoint = graph.getVertex(wpIndex);
+
+	return waypoint == refWaypoint;
 }
 
 /**
- * A test function used to test the results of _connectWaypoint()
- * @param waypointIndex the index of the waypoint
- * @return
+ * A test function used to test the _findClosestWaypointDijkstra() function
+ * @param dataDirectory the path to the data source for the GraphModel
+ * @param wpSepThresh the threshold that causes a new waypoint to be generated
+ * @param pos the position used to check for a waypoint
+ * @param waypoints the waypoints the graph should contain for the test
+ * @param refWaypoint the waypoint that should be returned
+ * @return a boolean value indicating if the test passes
  */
-const vector<GraphModel::Edge> GraphModel::testConnectWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos)
+bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint)
 {
+	GraphModel graph(dataDirectory, wpSepThresh);
 
+	// Insert the waypoints into the graph
+	for (const auto &wpPos : waypoints)
+		graph._insertWaypoint(wpPos);
+
+	// Get the index of the closest waypoint to pos
+	auto wpIndex = graph._findNearestWaypoint(pos);
+
+	// Compare the waypoint to refWaypoint
+	auto waypoint = graph.getVertex(wpIndex);
+
+	return waypoint == refWaypoint;
+}
+
+/**
+ * A test function used to test the _connectWaypoint() function
+ * @param dataDirectory the path to the data source for the GraphModel
+ * @param wpSepThresh the threshold that causes a new waypoint to be generated
+ * @param positions the positions used to setup the waypoints in the graph
+ * @param waypoint the specific waypoint to check for edges
+ * @param refEdges the required values for the edges for a given waypoint
+ * @return a boolean value indicating if the test passes
+ */
+bool GraphModel::testConnectWaypoint(string &dataDirectory, const double &wpSepThresh, const vector<CoordGeodetic>& positions, const Vertex &waypoint, const vector<Edge> &refEdges)
+{
+	// Create an instance of the GraphModel class
+	GraphModel graph(dataDirectory, wpSepThresh);
+
+	// Test the positions passed to the function to generate waypoints in the graph
+	for (const auto &pos : positions)
+		graph._findNearestWaypoint(pos);
+
+	// Get the edges for the waypoint passed to the function
+	auto edges = graph.getWaypointEdges(waypoint.index);
+
+	// Compare the edges to the refEdges
+	for (const auto &edge : edges)
+	{
+
+	}
 }
 
 
@@ -87,12 +149,11 @@ int GraphModel::_getNextVertexIndex()
  */
 int GraphModel::_insertVertex(const CoordGeodetic &pos, bool isWaypoint)
 {
-	Vertex vertex;
-	vertex.position = pos;
-	vertex.isWaypoint = isWaypoint;
-
 	int index = _getNextVertexIndex();
+	Vertex vertex = { index, isWaypoint, pos };
+
 	_vertices[index] = vertex;
+	_indices.insert(index);
 
 	return index;
 }
@@ -148,80 +209,145 @@ void GraphModel::_connectWaypoint(const int &index)
 	// Connect the waypoint to all the waypoints that are within the threshold distance
 	for (const auto &wpIndex : _waypoints)
 	{
-		_insertWpEdge(index, wpIndex);
+		if (wpIndex != index)
+		{
+			_insertWpEdge(index, wpIndex);
+			_insertWpEdge(wpIndex, index);
+		}
 	}
 }
 
 /* ========== PRIVATE SEARCH METHODS ========== */
 /**
- * Searches for the closest waypoint relative to position and a waypoint threshold
- * @param pos the position to search for
- * @return a reference to the waypoint
+ * Gets the minimum distance from a map passed to the function
+ * @param distances a map of vertex indices and distances
+ * @return the index of the vertex that has the minimum distance
  */
-const GraphModel::Vertex& GraphModel::_getNearestWaypoint(const CoordGeodetic &pos)
+int GraphModel::_getIndexWithMinimumDistance(map<int, double> &distances)
 {
-	// First, check the waypoint latitude map to determine if there is a waypoint candidate with a latitude within the threshold
-	auto latLowerBound = pos.latitude - _wpSeparation;
-	auto latUpperBound = pos.latitude + _wpSeparation;
-	auto longLowerBound = pos.longitude - _wpSeparation;
-	auto longUpperBound = pos.longitude + _wpSeparation;
-
-	auto lowerBoundIter = _wpLatMap.lower_bound(latLowerBound);
-	auto upperBoundIter = _wpLatMap.upper_bound(latUpperBound);
-
-	// Iterate through the _wpLatMap to find possible waypoints
-	unordered_set<int> wpCandidates;
-	for (auto iter = lowerBoundIter; iter != upperBoundIter; ++iter)
+	int closestVertex = -1;
+	double minDistance = numeric_limits<double>::infinity();
+	for (const auto& [index, distance] : distances)
 	{
-		// Check to see if the waypoint's longitude is in range
-		auto wpIndex = iter->second;
-		auto wp = _vertices[wpIndex];
-
-		if (wp.position.longitude >= longLowerBound && wp.position.longitude <= longUpperBound)
-			wpCandidates.insert(wpIndex);
-	}
-
-
-	// Second, check the waypoint longitude map to determine if there is a waypoint candidate with a longitude within the threshold
-	lowerBoundIter = _wpLongMap.lower_bound(longLowerBound);
-	upperBoundIter = _wpLongMap.upper_bound(longUpperBound);
-	for (auto iter = lowerBoundIter; iter != upperBoundIter; ++iter)
-	{
-		// Check to see if the waypoint's longitude is in range
-		auto wpIndex = iter->second;
-		auto wp = _vertices[wpIndex];
-
-		if (wp.position.latitude >= latLowerBound && wp.position.latitude <= latUpperBound)
-			wpCandidates.insert(wpIndex);
-	}
-
-	// If a there are still waypoint candidates, get the nearest waypoint
-	double minDist = numeric_limits<double>::max(), testDist;
-	int selectedIndex = -1;
-	for (const auto &wp : wpCandidates)
-	{
-		testDist = Utility::getDistance(pos, _vertices[wp].position);
-
-		if (testDist < minDist)
+		if (distance < minDistance)
 		{
-			minDist = testDist;
-			selectedIndex = wp;
+			minDistance = distance;
+			closestVertex = index;
 		}
 	}
 
-	// If there isn't a waypoint whose latitude is within the threshold, insert a new waypoint
-	if (selectedIndex == -1)
-		return _insertWaypoint(pos);
-	else
-		return _vertices[selectedIndex];
+	return closestVertex;
 }
 
 /**
- * Performs a breath first search to return waypoints that are within range
- * @param range the threshold to test the waypoints
- * @return an unordered set of the indices for the waypoints that are within range
+ * Finds the shortest path distance between a source position and all vertices in the graph
+ * @param pos the position used to make the distance comparisons
+ * @param graph the adjacency list to determine the closest vertex for
+ * @return a map connecting all the indices and the minimum distance
  */
-unordered_set<int> GraphModel::_getWaypointsInRange(const int &sourceIndex, const double &range)
+map<int, double> GraphModel::_dijkstra(const CoordGeodetic& pos, const map<int, vector<Edge>> &graph)
 {
+	priority_queue<pair<double, int>, vector<pair<double, int>>,greater<>> pq;
+	map<int, double> distances;
+	map<int, bool> visited;
 
+	for (const auto& [index, edges] : graph)
+	{
+		distances[index] = numeric_limits<double>::infinity();
+		visited[index] = false;
+	}
+
+	int startVertex = -1;
+	double minInitialDistance = numeric_limits<double>::infinity();
+	for (const auto& [ index, edges] : graph)
+	{
+		double distance = Utility::getDistance(pos, _vertices[index].position);
+		if (distance < minInitialDistance)
+		{
+			minInitialDistance = distance;
+			startVertex = index;
+		}
+	}
+
+	distances[startVertex] = 0.0;
+	pq.emplace(0.0, startVertex);
+
+	while (!pq.empty())
+	{
+		int currentVertex = pq.top().second;
+		pq.pop();
+
+		if (visited[currentVertex]) continue;
+		visited[currentVertex] = true;
+
+		for (const auto& edge : graph.at(currentVertex))
+		{
+			int neighbor = edge.index;
+			double weight = edge.weight;
+
+			if (distances[currentVertex] + weight < distances[neighbor])
+			{
+				distances[neighbor] = distances[currentVertex] + weight;
+				pq.emplace(distances[neighbor], neighbor);
+			}
+		}
+	}
+
+	return distances;
+}
+
+/**
+ * Finds the closest vertex index to a position for a group of indices and an adjacency list
+ * @param pos the position used to make the distance comparisons
+ * @return the index of the vertex closest to the position passed to the function
+ */
+int GraphModel::_findNearestVertex(const CoordGeodetic &pos)
+{
+	auto distMap = _dijkstra(pos, _vertexAdjList);
+
+	return _getIndexWithMinimumDistance(distMap);
+}
+
+/**
+ * Finds the closest waypoint in the waypoint adjacency list
+ * @param pos the position used to make the distance comparisons
+ * @return the index of the vertex closest to the position passed to the function
+ */
+int GraphModel::_findNearestWaypoint(const CoordGeodetic &pos)
+{
+	if (_wpCount != 0)
+	{
+		auto distMap = _dijkstra(pos, _wpAdjList);
+		auto wpIndex = _getIndexWithMinimumDistance(distMap);
+
+		// Determine if the nearest waypoint is within the threshold or if a new waypoint should be inserted
+		auto waypoint = _vertices[wpIndex];
+		auto distFromWaypoint = Utility::getDistance(pos, waypoint.position);
+
+		if (distFromWaypoint < _wpSeparation)
+			return wpIndex;
+	}
+
+	// If a valid waypoint was not found, insert a new one
+	return _insertWaypoint(pos).index;
+}
+
+/**
+ * Finds the vertices that are within a certain range of a position
+ * @param pos the position used to make the distance comparisons
+ * @param range the threshold used to filter the distances to the vertices
+ * @return
+ */
+unordered_set<int> GraphModel::_findVerticesWithinRange(const CoordGeodetic &pos, const double &range)
+{
+	auto distances = _dijkstra(pos, _vertexAdjList);
+
+	unordered_set<int> inRange;
+	for (const auto &[index, distance] : distances)
+	{
+		if (distance < range)
+			inRange.insert(index);
+	}
+
+	return inRange;
 }
