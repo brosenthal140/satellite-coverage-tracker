@@ -34,12 +34,14 @@ This is a template class which both the LinearModel and GraphModel classes inher
 ### Mutators
 - `import()` - Performs the import process for all .tle files found in the data directory
 - `insert()` - Inserts a single data point into the data structure
-- `insertVertex()` - takes in a Tle object and inserts a vertex
 
 ### Accessors
 - `search()` - performs a search of the data structure to find datapoint that are in range relative to a position
-- `getVertex()` - returns a reference to a vertex object based on the index passed to the function
-- `getWaypointEdges()` - returns a reference to a vector containing the edges for a waypoint whose index matches the index passed to the function
+
+### Static Tests
+- `testFindClosestWaypoint()` - Takes in a position, checks the positions and inserts a waypoint because one does not exist, then compares the waypoint to a reference
+- `testFindClosestWaypoint()` - Takes in a position and and a vector of waypoints, and compares the closes waypoint to a reference waypoint
+- `testInsert()` - Tests inserting a two line element into the Graph and compares the Vertex that was generated to a reference vertex
 
 ## LinearModel Class
 
