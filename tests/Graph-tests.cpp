@@ -57,3 +57,8 @@ TEST_CASE("Get the waypoint nearest to a position", "[GraphModel][Waypoint][Sear
 	// Test the waypoints to add them to the graph
 	REQUIRE(GraphModel::testFindClosestWaypoint(dataDirectory, wpSepThreshDeg, refPosition, wpPositions, refWaypoint));
 }
+
+TEST_CASE("Insert an observation", "[GraphModel][Insert]")
+{
+
+}

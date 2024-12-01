@@ -36,12 +36,10 @@ public:
 	/* ========== PUBLIC ACCESSORS ========== */
 	vector<int> search(const CoordGeodetic &position, const double &radius) override;
 	const Vertex& getVertex(const int &index);
-	const vector<Edge>& getWaypointEdges(const int &index);
 
 	/* ========== PUBLIC TEST METHODS ========== */
 	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint);
 	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint);
-	static bool testConnectWaypoint(string &dataDirectory, const double &wpSepThresh, const vector<CoordGeodetic> &positions, const Vertex &waypoint, const vector<Edge> &refEdges);
 
 private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
@@ -72,6 +70,8 @@ private:
 	static int _getIndexWithMinimumDistance(map<int, double> &distances);
 	map<int, double> _dijkstra(const CoordGeodetic &pos, const map<int, vector<Edge>> &graph);
 	int _findNearestVertex(const CoordGeodetic &pos);
-	int _findNearestWaypoint(const CoordGeodetic &pos);
+	int _findNearestWaypoint(const CoordGeodetic &pos, bool insertOnFailure);
 	unordered_set<int> _findVerticesWithinRange(const CoordGeodetic &pos, const double &range);
+	unordered_set<int> _findWaypointsWithinRange(const CoordGeodetic &pos, const double &range);
+	unordered_set<int> _filterCluster(const Vertex &waypoint, const double &range);
 };

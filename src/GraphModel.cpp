@@ -64,6 +64,10 @@ void GraphModel::insert(const Tle &tle)
 vector<int> GraphModel::search(const CoordGeodetic &position, const double &radius)
 {
 	// TODO: Implement search() function
+	// Traverse the wpAdjList to find any other waypoints that are in range
+	auto waypoints = _findWaypointsWithinRange(position, radius);
+
+
 }
 
 /**
@@ -76,15 +80,6 @@ const GraphModel::Vertex& GraphModel::getVertex(const int &index)
 	return _vertices[index];
 }
 
-/**
- * Gets the edges for a given waypoint index
- * @param index the index of the waypoint whose edges should be returned
- * @return a reference to a vector of edges
- */
-const vector<GraphModel::Edge>& GraphModel::getWaypointEdges(const int &index)
-{
-	return _wpAdjList[index];
-}
 
 /* ========== PUBLIC TEST METHODS ========== */
 /**
@@ -98,7 +93,7 @@ const vector<GraphModel::Edge>& GraphModel::getWaypointEdges(const int &index)
 bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint)
 {
 	GraphModel graph(dataDirectory, wpSepThresh);
-	auto wpIndex = graph._findNearestWaypoint(pos);
+	auto wpIndex = graph._findNearestWaypoint(pos, true);
 	auto waypoint = graph.getVertex(wpIndex);
 
 	return waypoint == refWaypoint;
@@ -122,40 +117,12 @@ bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const double &wp
 		graph._insertWaypoint(wpPos);
 
 	// Get the index of the closest waypoint to pos
-	auto wpIndex = graph._findNearestWaypoint(pos);
+	auto wpIndex = graph._findNearestWaypoint(pos, true);
 
 	// Compare the waypoint to refWaypoint
 	auto waypoint = graph.getVertex(wpIndex);
 
 	return waypoint == refWaypoint;
-}
-
-/**
- * A test function used to test the _connectWaypoint() function
- * @param dataDirectory the path to the data source for the GraphModel
- * @param wpSepThresh the threshold that causes a new waypoint to be generated
- * @param positions the positions used to setup the waypoints in the graph
- * @param waypoint the specific waypoint to check for edges
- * @param refEdges the required values for the edges for a given waypoint
- * @return a boolean value indicating if the test passes
- */
-bool GraphModel::testConnectWaypoint(string &dataDirectory, const double &wpSepThresh, const vector<CoordGeodetic>& positions, const Vertex &waypoint, const vector<Edge> &refEdges)
-{
-	// Create an instance of the GraphModel class
-	GraphModel graph(dataDirectory, wpSepThresh);
-
-	// Test the positions passed to the function to generate waypoints in the graph
-	for (const auto &pos : positions)
-		graph._findNearestWaypoint(pos);
-
-	// Get the edges for the waypoint passed to the function
-	auto edges = graph.getWaypointEdges(waypoint.index);
-
-	// Compare the edges to the refEdges
-	for (const auto &edge : edges)
-	{
-
-	}
 }
 
 
@@ -182,6 +149,8 @@ int GraphModel::_insertVertex(const CoordGeodetic &pos, bool isWaypoint)
 
 	_vertices[index] = vertex;
 	_indices.insert(index);
+
+	// TODO: find the nearest waypoint to the new vertex and add an edge from the waypoint to the vertex
 
 	return index;
 }
@@ -339,9 +308,10 @@ int GraphModel::_findNearestVertex(const CoordGeodetic &pos)
 /**
  * Finds the closest waypoint in the waypoint adjacency list
  * @param pos the position used to make the distance comparisons
+ * @param insertOnFailure if a valid waypoint is not found, insert a new one
  * @return the index of the vertex closest to the position passed to the function
  */
-int GraphModel::_findNearestWaypoint(const CoordGeodetic &pos)
+int GraphModel::_findNearestWaypoint(const CoordGeodetic &pos, bool insertOnFailure)
 {
 	if (_wpCount != 0)
 	{
@@ -356,8 +326,11 @@ int GraphModel::_findNearestWaypoint(const CoordGeodetic &pos)
 			return wpIndex;
 	}
 
-	// If a valid waypoint was not found, insert a new one
-	return _insertWaypoint(pos).index;
+	// If a valid waypoint was not found, and insertOnFailure is true, insert a new one
+	if (insertOnFailure)
+		return _insertWaypoint(pos).index;
+	else
+		return -1;
 }
 
 /**
@@ -378,4 +351,35 @@ unordered_set<int> GraphModel::_findVerticesWithinRange(const CoordGeodetic &pos
 	}
 
 	return inRange;
+}
+
+/**
+ * Finds the waypoints that are within a certain range of a position
+ * @param pos the position used to make the distance comparisons
+ * @param range the threshold used to filter the distances to the waypoints
+ * @return
+ */
+unordered_set<int> GraphModel::_findWaypointsWithinRange(const CoordGeodetic &pos, const double &range)
+{
+	auto distances = _dijkstra(pos, _wpAdjList);
+
+	unordered_set<int> inRange;
+	for (const auto &[index, distance] : distances)
+	{
+		if (distance < range)
+			inRange.insert(index);
+	}
+
+	return inRange;
+}
+
+/**
+ * Traverses all the edges in a cluster and returns a set of the vertex indices within a specific range of a waypoint
+ * @param waypoint a reference to the waypoint object for the cluster
+ * @param range the value to filter the edges to associated with a waypoint
+ * @return a set containing the indices that are within range of the waypoint
+ */
+unordered_set<int> GraphModel::_filterCluster(const Vertex &waypoint, const double &range)
+{
+	// TODO: Implement the _filterCluster() function in the GraphModel class
 }
