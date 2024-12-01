@@ -70,16 +70,6 @@ vector<int> GraphModel::search(const CoordGeodetic &position, const double &radi
 
 }
 
-/**
- * Gets a vertex by index by index from the graph
- * @param index the index of the vertex to be returned
- * @return a reference to the Vertex matching the index passes to the function
- */
-const GraphModel::Vertex& GraphModel::getVertex(const int &index)
-{
-	return _vertices[index];
-}
-
 
 /* ========== PUBLIC TEST METHODS ========== */
 /**
@@ -94,7 +84,7 @@ bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const double &wp
 {
 	GraphModel graph(dataDirectory, wpSepThresh);
 	auto wpIndex = graph._findNearestWaypoint(pos, true);
-	auto waypoint = graph.getVertex(wpIndex);
+	auto waypoint = graph._vertices[wpIndex];
 
 	return waypoint == refWaypoint;
 }
@@ -120,9 +110,31 @@ bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const double &wp
 	auto wpIndex = graph._findNearestWaypoint(pos, true);
 
 	// Compare the waypoint to refWaypoint
-	auto waypoint = graph.getVertex(wpIndex);
+	auto waypoint = graph._vertices[wpIndex];
 
 	return waypoint == refWaypoint;
+}
+
+/**
+ * A test function used to test the insert() function
+ * @param dataDirectory the path to the data source for the GraphModel
+ * @param wpSepThresh the threshold that causes a new waypoint to be generated
+ * @param tle a reference to a Tle object that will be inserted into the graph
+ * @param refVertex a reference to a Vertex object used to test if the pass succeeded
+ * @return a boolean value indicating if the test passes
+ */
+bool GraphModel::testInsert(string &dataDirectory, const double &wpSepThresh, const Tle &tle, const Vertex &refVertex)
+{
+	// Create an instance of the GraphModel class
+	GraphModel graph(dataDirectory, wpSepThresh);
+
+	// Insert an observation
+	graph.insert(tle);
+
+	// Get the newly a reference to the newly inserted vertex
+	auto vertex = graph._vertices[0];
+
+	return refVertex == vertex;
 }
 
 
@@ -150,7 +162,12 @@ int GraphModel::_insertVertex(const CoordGeodetic &pos, bool isWaypoint)
 	_vertices[index] = vertex;
 	_indices.insert(index);
 
-	// TODO: find the nearest waypoint to the new vertex and add an edge from the waypoint to the vertex
+	// If the vertex is not a waypoint, insert an edge for it's cluster
+	if (!isWaypoint)
+	{
+		auto wpIndex = _findNearestWaypoint(pos, true);
+		_insertEdge(wpIndex, index);
+	}
 
 	return index;
 }

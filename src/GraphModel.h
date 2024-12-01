@@ -34,18 +34,18 @@ public:
 	void insert(const Tle &tle) override;
 
 	/* ========== PUBLIC ACCESSORS ========== */
-	vector<int> search(const CoordGeodetic &position, const double &radius) override;
-	const Vertex& getVertex(const int &index);
+	vector<int> search(const CoordGeodetic &position, const double &radius) override; // Returns a vector of the satellite catalog numbers
 
 	/* ========== PUBLIC TEST METHODS ========== */
 	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint);
 	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint);
+	static bool testInsert(string &dataDirectory, const double &wpSepThresh, const Tle &tle, const Vertex &refVertex);
 
 private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
 	string _dataDirectory;
 
-	map<int, const Tle&> _observations;
+	map<int, const Tle&> _observations; // key: vertex index, value: Tle of observation
 	unordered_set<int> _indices;
 	map<int, Vertex> _vertices;
 	map<int, vector<Edge>> _vertexAdjList;
