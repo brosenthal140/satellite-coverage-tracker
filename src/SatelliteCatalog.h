@@ -44,7 +44,7 @@ private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
 	string _directory;
 	string _pathToCatalogFile;
-	map<int, CatalogEntry> _catalog;
+	map<int, CatalogEntry> _catalog; // key: catalog number, value: The catalog object
 	int _count;
 
 	/* ========== PRIVATE HELPER FUNCTIONS ========== */

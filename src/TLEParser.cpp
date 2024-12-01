@@ -28,19 +28,24 @@ Tle TLEParser::parse(const string &line1, const string &line2, const string &lin
 {
 	return _parse(line1, line2, line3);
 }
-CoordGeodetic TLEParser::getCoordGeodetic(const string &line1, const string &line2, const string &line3)
+
+CoordGeodetic TLEParser::getCoordGeodetic(const Tle &tle)
 {
-	auto tle = TLEParser::parse(line1, line2, line3);
 	SGP4 sgp4(tle);
 
 	return sgp4.FindPosition(tle.Epoch()).ToGeodetic();
 }
+CoordGeodetic TLEParser::getCoordGeodetic(const string &line1, const string &line2, const string &line3)
+{
+	auto tle = TLEParser::parse(line1, line2, line3);
+
+	return TLEParser::getCoordGeodetic(tle);
+}
 CoordGeodetic TLEParser::getCoordGeodetic(const string &line1, const string &line2)
 {
 	auto tle = TLEParser::parse(line1, line2);
-	SGP4 sgp4(tle);
 
-	return sgp4.FindPosition(tle.Epoch()).ToGeodetic();
+	return TLEParser::getCoordGeodetic(tle);
 }
 
 /* =============== PRIVATE METHODS ===============
