@@ -183,7 +183,9 @@ const GraphModel::Vertex& GraphModel::_insertWaypoint(const CoordGeodetic &pos)
  */
 void GraphModel::_insertEdge(const int &from, const int &to)
 {
-	// TODO: implement _insertEdge() function
+	Edge edge = { to, Utility::getDistance(_vertices[from].position, _vertices[to].position) };
+
+	_vertexAdjList[from].emplace_back(edge);
 }
 
 /**
