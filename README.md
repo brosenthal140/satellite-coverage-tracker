@@ -20,10 +20,6 @@ The data ingestion feature uses the `TLEParser` and `SatelliteCoverageTracker` c
 ### Usage
 1. Place your TLE files in the `data/` directory (note that this directory is ignored by `.gitignore` and won't be uploaded).
 2. Run the main program to parse and ingest the TLE data.
-3. Use the following command to start the ingestion:
-   ```bash
-   ./SatelliteCoverageTracker --ingest data/sample_tle.tle
-
 
 ## DataModel Class
 ***
