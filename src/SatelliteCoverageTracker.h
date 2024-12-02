@@ -5,8 +5,10 @@
 using namespace std;
 using namespace libsgp4;
 
-template <typename T>
-class SatelliteCoverageTracker {
+
+struct SatelliteCoverageTracker {
+public: 
+	void importDataFromLocalFile(const std::string& inputFilePath);
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
 	SatelliteCoverageTracker(const string &pathToData, const DateTime &dateTime, const CoordGeodetic &location);
 
