@@ -169,25 +169,96 @@ This class takes in TLE data and splits it into it's components do it can be use
 ```mermaid
 classDiagram
 class Tle {
-    
+    Tle(line_one, line_two)
+    Tle(name, line_one, line_two)
+    Tle(tle)
+    Name() string
+    Line1() string
+    Line2() string
+    NoradNumber() unsigned int
+    IntDesignator() string
+    Epoch() DateTime
+    MeanMotionDt2() double
+    MeanMotionDdt6() double
+    BStar() double
+    Inclination(in_degrees) double
+    Eccentricity() double
+    ArgumentPerigee(in_degrees) double
+    MeanAnomaly(in_degrees) double
+    MeanMotion() double
+    ToString() string
+    LineLength()$ unsigned int
 }
 ```
 
 
 ### Eci Class
+This class represents an Earth-centered inertial position for a particular time
 
 ```mermaid
 classDiagram
 class Eci {
-    
+    Eci(dt, latitude, longitude, altitude)
+    Eci(dt, geo)
+    Eci(dt, position)
+    Eci(dt, position, velocity)
+    operator==(dt) bool
+    operator!=(dt) bool
+    Update(dt, geo)
+    Position() Vector
+    Velocity() Vector
+    GetDateTime() DateTime
+    ToGeodetic() CoordGeodetic
 }
 ```
 
 ### DateTime Class
+This class is used to represent the date and time in other classes in the SGP4 library
 
 ```mermaid
 classDiagram
 class DateTime {
-    
-}
+    DateTime()
+    DateTime(ticks)
+    DateTime(year, day)
+    DateTime(year, month, day)
+    DateTime(year, month, day, hout, minute, second)
+    DateTime(year, month, day, hout, minute, second, microsecond)
+    Initalise(year, month, day, hout, minute, second, microsecond)
+    Now(useMicroseconds)$ bool
+    IsLeapYear(year)$ bool
+    IsValidYear(year)$ bool
+    IsValidYearMonthDay(year, month, day)$ bool
+    DaysInMonth(year, month)$ int
+    DayOfYear(year, month, day) int
+    AbsoluteDays(year, day) double
+    AbsoluteDays(year, month, day) double
+    TimeOfDay() TimeSpan
+    DayOfWeek() int
+    Equals(dt) bool
+    Compare(dt) int
+    AddYears(years) DateTime
+    AddMonths(months) DateTime
+    Add(t) DateTime
+    AddDays(days) DateTime
+    AddHours(hours) DateTime
+    AddMinutes(minutes) DateTime
+    AddSeconds(seconds) DateTime
+    AddMicroseconds(microseconds) DateTime
+    AddTicks(ticks) DateTime
+    Ticks() int64_t
+    FromTicks(year, month, day)
+    Year() int
+    Month() int
+    Day() int
+    Hour() int
+    Minute() int
+    Second() int
+    Microsecond() int
+    ToJulian() double
+    ToGreenwichSiderealTime() double
+    ToJ2000() double
+    ToLocalMeanSiderealTime(lon) double
+    ToString() string
+ }
 ```
