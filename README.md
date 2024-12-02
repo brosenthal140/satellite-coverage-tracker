@@ -15,10 +15,10 @@ The following section provides a summary of each custom class used in the projec
 ## TLEParser Class
 
 ## Data Ingestion
-The data ingestion feature uses the `TLEParser` and `SatelliteCoverageTracker` classes to load and process satellite data from TLE files.
+Feature uses  `TLEParser` and `SatelliteCoverageTracker` classes to load and process satellite data from TLE files.
 
 ### Usage
-1. Place your TLE files in the `data/` directory (note that this directory is ignored by `.gitignore` and won't be uploaded).
+1. Place your TLE files in the `data/` directory.
 2. Run the main program to parse and ingest the TLE data.
 
 ## DataModel Class
