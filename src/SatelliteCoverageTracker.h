@@ -7,8 +7,7 @@ using namespace libsgp4;
 
 
 struct SatelliteCoverageTracker {
-public: 
-	void importDataFromLocalFile(const std::string& inputFilePath);
+public:
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
 	SatelliteCoverageTracker(const string &pathToData, const DateTime &dateTime, const CoordGeodetic &location);
 
