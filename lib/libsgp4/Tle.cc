@@ -99,9 +99,9 @@ void Tle::Initialize()
 	satString2 = line_two_.substr(TLE2_COL_NORADNUM,TLE2_LEN_NORADNUM);
 
 	if (satString1[0] == 'T')
-		satString1.substr(1);
+		satString1 = satString1.substr(1);
 	if (satString2[0] == 'T')
-		satString2.substr(1);
+		satString2 = satString2.substr(1);
 
     ExtractInteger(satString1, sat_number_1);
     ExtractInteger(satString2, sat_number_2);
