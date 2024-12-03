@@ -20,12 +20,12 @@ This is the main class for this project and is used to run the process.
 ```mermaid
 classDiagram
 class SatelliteCoverageTracker {
-    SatelliteCoverageTracker(pathToData, dateTime, location)
+    SatelliteCoverageTracker(pathToData, location, radius)
 }
 ```
 
 ### Construction
-- `SatelliteCoverageTracker()` - A constructor which takes in the path to the data directory, a date time to test for observations, and a location to filter the observations
+- `SatelliteCoverageTracker()` - A constructor which takes in the path to the data directory, a location, and radius to filter the observations
 
 ## SatelliteCatalog
 ***

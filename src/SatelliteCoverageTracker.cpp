@@ -1,49 +1,55 @@
 #include "SatelliteCoverageTracker.h"
+
+#include <utility>
 #include "TLEParser.h"
-#include <fstream>
-using namespace std; 
+#include "GraphModel.h"
+#include "LinearModel.h"
+
+using namespace std;
+using namespace libsgp4;
 
 /* =============== PUBLIC METHODS =============== */
 /* ---------------------------------------------- */
 
 
 /* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-SatelliteCoverageTracker::SatelliteCoverageTracker(const string& pathToData, const CoordGeodetic& location, const double &radius)
-    : _pathToDataDirectory(pathToData), _radius(radius), _locationRef(location)
+/**
+ * A constructor for the SatelliteCoverageTracker class
+ * @param pathToData the path to the directory containing the data file
+ * @param location a reference to the location used for the search
+ * @param radius a range used to filter observations adjacent to the target location
+ */
+SatelliteCoverageTracker::SatelliteCoverageTracker(string  pathToData, const CoordGeodetic& location, const double &radius)
+    : _dataDirectory(std::move(pathToData)), _radius(radius), _locationRef(location)
 {
+	// Import all the .tle files
     _importData();
+
+	// Initialize the two models
+	_graphModel = new GraphModel(_dataDirectory);
+	_linearModel = new LinearModel(_dataDirectory);
+}
+
+/**
+ * Destructor that deletes dynamically allocated models
+ */
+SatelliteCoverageTracker::~SatelliteCoverageTracker()
+{
+	delete _graphModel;
+	delete _linearModel;
 }
 
 /* =============== PRIVATE METHODS =============== */
 /* ---------------------------------------------- */
-
+/**
+ * Imports all the .tle file found in the data directory
+ */
 void SatelliteCoverageTracker::_importData()
 {
-    TLEParser parser;
-    const string tleFilePath = _pathToDataDirectory + "/tle_data.txt";
+    // Get the file names with the .tle extension in the _dataDirectory
+	auto paths = TLEParser::getTLEFiles(_dataDirectory);
 
-    ifstream tleFile(tleFilePath);
-    if (!tleFile.is_open()) {
-        string error_statement;
-        error_statement = "Could not open TLE file: ";
-        cerr << error_statement << tleFilePath << endl;
-        return;
-    }
-
-    string TLE_Line1, TLE_Line2, TLE_Line3;
-    while (getline(tleFile, TLE_Line1)) {
-        if (getline(tleFile, TLE_Line2) && getline(tleFile, TLE_Line3)) {
-            
-            Tle tle = TLEParser::parse(TLE_Line1, TLE_Line2, TLE_Line3);
-            (*_dataModel).insert(tle);
-        }
-        else {
-            string error_statement;
-            error_statement = "TLE record found, but incomplete: ";
-            cerr << error_statement << tleFilePath << endl;
-            break;
-        }
-    }
-
-    tleFile.close();
+	// For each file, process the files and insert the TLE entries into the model
+	for (const auto &filePath : paths)
+		TLEParser::parseTLEFile(filePath, _observations, false);
 }
