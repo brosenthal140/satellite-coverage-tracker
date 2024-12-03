@@ -8,8 +8,8 @@ using namespace std;
 
 
 /* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-SatelliteCoverageTracker::SatelliteCoverageTracker(const string& pathToData, const DateTime& dateTime, const CoordGeodetic& location)
-    : _pathToDataDirectory(pathToData), _dateTimeRef(dateTime), _locationRef(location)
+SatelliteCoverageTracker::SatelliteCoverageTracker(const string& pathToData, const CoordGeodetic& location, const double &radius)
+    : _pathToDataDirectory(pathToData), _radius(radius), _locationRef(location)
 {
     _importData();
 }
