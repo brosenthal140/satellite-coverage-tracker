@@ -30,6 +30,7 @@ public:
 
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
 	GraphModel(string &directory);
+	~GraphModel() override;
 
 	/* ========== PUBLIC MUTATORS ========== */
 	void import() override;

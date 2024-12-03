@@ -43,6 +43,7 @@ bool GraphModel::Edge::operator==(const Edge &rhs) const
 /* ---------------------------------------------- */
 /* ========== CONSTRUCTORS/DESTRUCTORS ========== */
 GraphModel::GraphModel(string &directory) : _dataDirectory(directory), _wpCount(0), _vertexCount(0), DataModel(directory) {}
+GraphModel::~GraphModel() {}
 
 /* ========== PUBLIC MUTATORS ========== */
 /**

@@ -20,6 +20,7 @@ class LinearModel: public DataModel {
 public:
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
 	explicit LinearModel(string &dataDirectory);
+	~LinearModel() override;
 
 	/* ========== PUBLIC MUTATORS ========== */
 	void import() override;
