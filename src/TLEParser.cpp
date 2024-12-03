@@ -61,10 +61,10 @@ bool TLEParser::fetchTLEDataFromFile(const string& inputFilePath, const string& 
 		string statement1, statement2;
 		statement1 = "Open input failed: ", statement2 = " Open output failed: ";
 		if (!inFile.is_open()) {
-			cout << statement1 << inputFilePath << endl;
+			cerr << statement1 << inputFilePath << endl;
 		}
 		if (!outFile.is_open()) {
-			cout << statement2 << outputPath << endl;
+			cerr << statement2 << outputPath << endl;
 		}
 		return false;
 	}
@@ -83,7 +83,7 @@ void TLEParser::parseTLE(const string& tlePath) {
 	if (!inFile.is_open()) {
 		string errorstatement;
 		errorstatement = "Can't open TLE file: ";
-		cout << errorstatement << tlePath << endl;
+		cerr << errorstatement << tlePath << endl;
 		return;
 	}
 
