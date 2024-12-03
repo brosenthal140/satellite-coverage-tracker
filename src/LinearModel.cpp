@@ -1,9 +1,11 @@
+#include <algorithm>
 #include "LinearModel.h"
+#include "TLEParser.h"
 
 /* ============== LinearModel CLASS ============== */
 /* ---------------------------------------------- */
 /* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-LinearModel::LinearModel(string &dataDirectory) : DataModel(dataDirectory) {}
+LinearModel::LinearModel(string &dataDirectory) : DataModel(dataDirectory), _dataDirectory(dataDirectory), _observationCount(0) {}
 
 /* ========== PUBLIC MUTATORS ========== */
 /**
@@ -16,11 +18,15 @@ void LinearModel::import()
 
 /**
  * Inserts an observation into the _observations map
- * @param tle
+ * @param tle a reference to the Tle object to be inserted into the model
  */
 void LinearModel::insert(const Tle &tle)
 {
-	// TODO: Implement insert() function in LinearModel class
+	// Get the NORAD category number and the position for the observation
+	auto catNum = tle.NoradNumber();
+	auto position = TLEParser::getCoordGeodetic(tle);
+
+	_insert(catNum, position);
 }
 
 /* ========== PUBLIC ACCESSORS ========== */
@@ -45,4 +51,34 @@ unordered_set<int> LinearModel::search(const CoordGeodetic &position, const doub
 void LinearModel::_insert(const int &catNum, const CoordGeodetic &pos)
 {
 	_observations[catNum].emplace_back(pos);
+	_observationCount++;
+}
+
+/* ========== PUBLIC TEST METHODS ========== */
+/**
+ * Tests the insert method
+ * @param dataDirectory the path to the data source for the GraphModel
+ * @param tle a reference to a Tle object that will be inserted into the graph
+ * @return a boolean value indicating if the test passed
+ */
+bool LinearModel::testInsert(string &dataDirectory, const Tle &tle)
+{
+	// Create an instance of the GraphModel class
+	LinearModel graph(dataDirectory);
+
+	// Insert an observation
+	graph.insert(tle);
+
+	auto catNum = tle.NoradNumber();
+	auto positions = graph._observations[catNum];
+	auto refPos = TLEParser::getCoordGeodetic(tle);
+
+	if (!positions.empty())
+	{
+		auto iter = find(positions.begin(), positions.end(), refPos);
+
+		return iter != positions.end();
+	}
+	else
+		return false;
 }

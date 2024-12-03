@@ -10,14 +10,16 @@ using namespace libsgp4;
 
 class LinearModel: public DataModel {
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
+	string _dataDirectory;
 	unordered_map<int, vector<CoordGeodetic>> _observations;
+	unsigned int _observationCount;
 
 	/* ========== PRIVATE INSERTION METHODS ========== */
 	void _insert(const int &catNum, const CoordGeodetic &pos);
 
 public:
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-	LinearModel(string &dataDirectory);
+	explicit LinearModel(string &dataDirectory);
 
 	/* ========== PUBLIC MUTATORS ========== */
 	void import() override;
@@ -25,5 +27,8 @@ public:
 
 	/* ========== PUBLIC ACCESSORS ========== */
 	unordered_set<int> search(const CoordGeodetic &position, const double &radius) override;
+
+	/* ========== PUBLIC TEST METHODS ========== */
+	static bool testInsert(string &dataDirectory, const Tle &tle);
 
 };
