@@ -28,3 +28,4 @@ public:
 	static CoordGeodetic getCoordGeodetic(const string &line1, const string &line2, const string &line3);
 	static CoordGeodetic getCoordGeodetic(const string &line1, const string &line2);
 };
+
