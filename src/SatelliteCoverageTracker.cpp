@@ -13,15 +13,15 @@ void SatelliteCoverageTracker::importDataFromLocalFile(const string& inputFilePa
     //--- Retrieves TLE datat from file ---------//
     bool success = parser.fetchTLEDataFromFile(inputFilePath, outputPath);
     if (success) {
-        string complete_statement; 
-        complete_statement = "Successfully retrieved TLE data.";
-        cout << complete_statement << endl;
+        string successful_statement;
+        successful_statement = "Successfully retrieved TLE data.";
+        cout << successful_statement << endl;
         parser.parseTLE(outputPath);
     }
     else {
-        string incomplete_statement;
-        incomplete_statement = "Unsuccessfully retrieved TLE data";
-        cout << incomplete_statement << endl;
+        string unsuccessful_statement;
+        unsuccessful_statement = "Unsuccessfully retrieved TLE data";
+        cerr << unsuccessful_statement << endl;
     }
 }
 
