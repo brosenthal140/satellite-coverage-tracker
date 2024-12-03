@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "LinearModel.h"
 #include "TLEParser.h"
+#include "Utility.h"
 
 /* ============== LinearModel CLASS ============== */
 /* ---------------------------------------------- */
@@ -38,7 +39,20 @@ void LinearModel::insert(const Tle &tle)
  */
 unordered_set<int> LinearModel::search(const CoordGeodetic &position, const double &radius)
 {
-	// TODO: Implement search() function in LinearModel class
+	unordered_set<int> catNums;
+	double distance;
+	for (const auto &entry : _observations)
+	{
+		for (const auto &pos : entry.second)
+		{
+			distance = Utility::getDistance(position, pos);
+
+			if (distance < radius)
+				catNums.insert(entry.first);
+		}
+	}
+
+	return catNums;
 }
 
 
@@ -48,7 +62,7 @@ unordered_set<int> LinearModel::search(const CoordGeodetic &position, const doub
  * @param catNum the NORAD category number for the observation
  * @param pos the position to be inserted into the _observations map
  */
-void LinearModel::_insert(const int &catNum, const CoordGeodetic &pos)
+void LinearModel::_insert(const unsigned int &catNum, const CoordGeodetic &pos)
 {
 	_observations[catNum].emplace_back(pos);
 	_observationCount++;
@@ -64,13 +78,13 @@ void LinearModel::_insert(const int &catNum, const CoordGeodetic &pos)
 bool LinearModel::testInsert(string &dataDirectory, const Tle &tle)
 {
 	// Create an instance of the GraphModel class
-	LinearModel graph(dataDirectory);
+	LinearModel model(dataDirectory);
 
 	// Insert an observation
-	graph.insert(tle);
+	model.insert(tle);
 
 	auto catNum = tle.NoradNumber();
-	auto positions = graph._observations[catNum];
+	auto positions = model._observations[catNum];
 	auto refPos = TLEParser::getCoordGeodetic(tle);
 
 	if (!positions.empty())
@@ -81,4 +95,27 @@ bool LinearModel::testInsert(string &dataDirectory, const Tle &tle)
 	}
 	else
 		return false;
+}
+
+/**
+ * Tests the search() function for the LinearModel class
+ * @param dataDirectory the path to the data source for the GraphModel
+ * @param observations a reference to a vector of Tle objects that represent the observation to insert into the model
+ * @param pos the position to search for
+ * @param radius the range from the target position the determines if the observation is valid
+ * @return an unordered set containing the NORAD category numbers of the observations that were within range of the position
+ */
+unordered_set<int> LinearModel::testSearch(string &dataDirectory, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius)
+{
+	// Create an instance of the GraphModel class
+	LinearModel model(dataDirectory);
+
+	// Insert the observations into the model
+	for (const auto &observation : observations)
+		model.insert(observation);
+
+	// Perform the search
+	auto results = model.search(pos, radius);
+
+	return results;
 }
