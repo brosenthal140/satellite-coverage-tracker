@@ -44,6 +44,7 @@ public:
 	static bool testInsert(string &dataDirectory, const double &wpSepThresh, const Tle &tle, const Vertex &refVertex);
 	static bool testFilterEdges(const vector<Edge> &edges, const double &maxWeight, const vector<Edge> &refEdges);
 	static unordered_set<int> testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius);
+	static void testImport(string &dataDirectory, const double &wpSepThresh);
 
 private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */

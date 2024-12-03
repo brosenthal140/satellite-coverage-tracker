@@ -150,6 +150,7 @@ class GraphModel {
     testInsert(dataDirectory, wpSepThresh, tle, refVertex)$ bool
     testFilterEdges(edges, maxWeight, refEdges)$ bool
     testSearch(dataDirectory, wpSepThresh, observations, pos, radius)$ unordered_set<int>
+    testImport(dataDirectory, wpSepThresh)$ 
 }
 class Vertex {
     index int
@@ -183,6 +184,7 @@ class Edge {
 - `testInsert()` - Tests inserting a two line element into the Graph and compares the Vertex that was generated to a reference vertex
 - `testFilterEdges()` - Tests the `_filterByWeight()` function which filters a vector of edges to return the vertices index whose weight (distance) is below the max weight
 - `testSearch()` - Tests the `search()` function which searches for observations that occurred within range of a position during the observation period
+- `testImport()` - Tests the `import()` function to check if the process throws any errors
 
 ## LinearModel Class
 ***

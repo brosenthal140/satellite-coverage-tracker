@@ -50,7 +50,21 @@ GraphModel::GraphModel(string &directory, const double &sepThresh) : _dataDirect
  */
 void GraphModel::import()
 {
-	// TODO: Implement the import() function for the GraphModel class
+	// Get the .tle files at the _dataDirectory
+	auto filePaths = TLEParser::getTLEFiles(_dataDirectory);
+
+	// For each file, process the files and insert the TLE entries into the model
+	vector<Tle> observations;
+	for (const auto &filePath : filePaths)
+	{
+		TLEParser::parseTLEFile(filePath, observations, false);
+	}
+
+	// For each observation, insert it into the model
+	for (const auto &tle : observations)
+	{
+		insert(tle);
+	}
 }
 
 /**
@@ -216,6 +230,20 @@ unordered_set<int> GraphModel::testSearch(string &dataDirectory, const double &w
 
 	// Compare the search result to the refSatCatNums
 	return result;
+}
+
+/**
+ * Tests the import() function
+ * @param dataDirectory the path to the data source for the GraphModel
+ * @param wpSepThresh the threshold that causes a new waypoint to be generated
+ */
+void GraphModel::testImport(string &dataDirectory, const double &wpSepThresh)
+{
+	// Create an instance of the GraphModel class
+	GraphModel graph(dataDirectory, wpSepThresh);
+
+	// Perform the import process
+	graph.import();
 }
 
 
