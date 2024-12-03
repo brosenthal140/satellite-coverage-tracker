@@ -36,14 +36,14 @@ public:
 	void insert(const Tle &tle) override;
 
 	/* ========== PUBLIC ACCESSORS ========== */
-	vector<int> search(const CoordGeodetic &position, const double &radius) override; // Returns a vector of the satellite catalog numbers
+	unordered_set<int> search(const CoordGeodetic &position, const double &radius) override; // Returns a vector of the satellite catalog numbers
 
 	/* ========== PUBLIC TEST METHODS ========== */
 	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint);
 	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint);
 	static bool testInsert(string &dataDirectory, const double &wpSepThresh, const Tle &tle, const Vertex &refVertex);
 	static bool testFilterEdges(const vector<Edge> &edges, const double &maxWeight, const vector<Edge> &refEdges);
-	static bool testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius, const vector<int> &refSatCatNums);
+	static bool testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius, const unordered_set<int> &refSatCatNums);
 
 private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
@@ -57,8 +57,6 @@ private:
 
 	map<int, vector<Edge>> _wpAdjList;
 	unordered_set<int> _waypoints;
-	map<double, int> _wpLatMap;
-	map<double, int> _wpLongMap;
 	double _wpSeparation;
 	int _wpCount;
 

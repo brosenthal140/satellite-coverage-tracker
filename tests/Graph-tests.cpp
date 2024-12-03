@@ -1,3 +1,4 @@
+#include <fstream>
 #include <catch2/catch_test_macros.hpp>
 #include <SGP4.h>
 #include "../src/GraphModel.h"
@@ -105,17 +106,40 @@ TEST_CASE("Search for observations relative to position and within a range", "[G
 {
 	// Parameters for test
 	string dataDirectory = "../data";
+	string pathToTestFile = "../data/test_01.tle";
 	double wpSepThreshDeg = 0.9;
+	CoordGeodetic pos = { 0, 158.925, 561.694, false };
+	double radius = 10; // units: km
+	unordered_set<int> refCatNums = { 12 };
 
-	// Example Tle
-	string line1 = "ISS (ZARYA)";
-	string line2 = "1 25544U 98067A   24336.59759280  .00020297  00000-0  36103-3 0  9999";
-	string line3 = "2 25544  51.6397 205.9875 0006915 289.9483 151.1375 15.50113255484516";
+	// Ingest the file
+	vector<Tle> tleObjs;
+	ifstream file(pathToTestFile);
+	int count = 0;
+	if (file.is_open())
+	{
+		string line1, line2;
+		while (getline(file, line1))
+		{
+			if (getline(file, line2))
+			{
+				cout << "Observation #" << to_string(count) << endl;
+				auto tle = TLEParser::parse(line1, line2);
+				cout << tle << endl;
+				tleObjs.emplace_back(tle);
+				auto position = TLEParser::getCoordGeodetic(tle);
+				cout << position << endl << endl;
 
-	// Create a Tle object from the example
+				count++;
+			}
+		}
 
-	// Generate several Tle observations with different time since observation
-	// TODO: Complete test of search function
-
+		REQUIRE(GraphModel::testSearch(dataDirectory, wpSepThreshDeg, tleObjs, pos, radius, refCatNums));
+	}
+	else
+	{
+		INFO("Test file at path '" + pathToTestFile + "' could not be opened!");
+		REQUIRE(false);
+	}
 
 }

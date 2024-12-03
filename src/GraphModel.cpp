@@ -77,7 +77,7 @@ void GraphModel::insert(const Tle &tle)
  * @param radius the range used to determine if a satellite is in range
  * @return a vector containing the unique catalog numbers of the satellites that are in range
  */
-vector<int> GraphModel::search(const CoordGeodetic &position, const double &radius)
+unordered_set<int> GraphModel::search(const CoordGeodetic &position, const double &radius)
 {
 	// Traverse the wpAdjList to find any other waypoints that are in range
 	auto waypoints = _findWaypointsWithinRange(position, radius);
@@ -105,9 +105,9 @@ vector<int> GraphModel::search(const CoordGeodetic &position, const double &radi
 	}
 
 	// For each of the filtered candidates, look it up in _observations map to get the original Tle object
-	vector<int> catalogNumbers(filteredCandidates.size());
+	unordered_set<int> catalogNumbers(filteredCandidates.size());
 	for (const auto &filteredIndex : filteredCandidates)
-		catalogNumbers.emplace_back(_observations.at(filteredIndex).NoradNumber());
+		catalogNumbers.insert(_observations.at(filteredIndex).NoradNumber());
 
 	return catalogNumbers;
 }
@@ -193,7 +193,7 @@ bool GraphModel::testFilterEdges(const vector<Edge> &edges, const double &maxWei
 	return (filteredEdges.size() == refEdges.size()) && equal(refEdges.begin(), refEdges.end(), filteredEdges.begin());
 }
 
-bool GraphModel::testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius, const vector<int> &refSatCatNums)
+bool GraphModel::testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius, const unordered_set<int> &refSatCatNums)
 {
 	// Create an instance of the GraphModel class
 	GraphModel graph(dataDirectory, wpSepThresh);
@@ -255,9 +255,9 @@ const GraphModel::Vertex& GraphModel::_insertWaypoint(const CoordGeodetic &pos)
 	_wpCount++;
 	_waypoints.insert(wpIndex);
 
-	// Adds the information about the new waypoint
-	_wpLatMap.insert({ pos.latitude, wpIndex });
-	_wpLongMap.insert({ pos.longitude, wpIndex});
+	// Initialize the waypoint in the waypoint adjacency list
+	vector<Edge> edges;
+	_wpAdjList[wpIndex] = edges;
 
 	// Connect the new waypoint to all the other waypoint
 	_connectWaypoint(wpIndex);

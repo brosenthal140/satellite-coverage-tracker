@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <unordered_set>
 #include "SGP4.h"
 
 using namespace std;
@@ -18,5 +19,5 @@ public:
 	virtual void insert(const Tle &tle) = 0;
 
 	/* ========== PUBLIC ACCESSORS ========== */
-	virtual vector<int> search(const CoordGeodetic &position, const double &radius) = 0;
+	virtual unordered_set<int> search(const CoordGeodetic &position, const double &radius) = 0;
 };
