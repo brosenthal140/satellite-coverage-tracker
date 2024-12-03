@@ -7,7 +7,7 @@
 using namespace std;
 
 /* =========== PUBLIC STATIC METHODS ============ */
-Tle TLEParser::parse(const string &tleString)
+Tle TLEParser::parse(string &tleString)
 {
 	// Split the string passed to the function into three lines
 	vector<string> lines(3);
@@ -15,6 +15,10 @@ Tle TLEParser::parse(const string &tleString)
 	istringstream stream(tleString);
 	while (getline(stream, line))
 	{
+		// If there is a carriage return at the end of the line, remove it
+		if (line.back() == '\r')
+			line.pop_back();
+
 		lines.emplace_back(line);
 	}
 
@@ -24,12 +28,26 @@ Tle TLEParser::parse(const string &tleString)
 	else
 		return _parse(lines[0], lines[1]);
 }
-Tle TLEParser::parse(const string &line1, const string &line2)
+Tle TLEParser::parse(string &line1, string &line2)
 {
+	// Check line 1 and line 2 to make sure there is not a carriage return character at the end of the string
+	if (line1.back() == '\r')
+		line1.pop_back();
+
+	if (line2.back() == '\r')
+		line2.pop_back();
+
 	return _parse(line1, line2);
 }
-Tle TLEParser::parse(const string &line1, const string &line2, const string &line3)
+Tle TLEParser::parse(string &line1, string &line2, string &line3)
 {
+	// Check line 2 and line 3 to make sure there is not a carriage return character at the end of the string
+	if (line2.back() == '\r')
+		line1.pop_back();
+
+	if (line3.back() == '\r')
+		line2.pop_back();
+
 	return _parse(line1, line2, line3);
 }
 
@@ -39,13 +57,13 @@ CoordGeodetic TLEParser::getCoordGeodetic(const Tle &tle)
 
 	return sgp4.FindPosition(tle.Epoch()).ToGeodetic();
 }
-CoordGeodetic TLEParser::getCoordGeodetic(const string &line1, const string &line2, const string &line3)
+CoordGeodetic TLEParser::getCoordGeodetic(string &line1, string &line2, string &line3)
 {
 	auto tle = TLEParser::parse(line1, line2, line3);
 
 	return TLEParser::getCoordGeodetic(tle);
 }
-CoordGeodetic TLEParser::getCoordGeodetic(const string &line1, const string &line2)
+CoordGeodetic TLEParser::getCoordGeodetic(string &line1, string &line2)
 {
 	auto tle = TLEParser::parse(line1, line2);
 
@@ -57,7 +75,7 @@ CoordGeodetic TLEParser::getCoordGeodetic(const string &line1, const string &lin
  * @param directoryPath the directory to search for files
  * @return a vector of strings representing the paths to the TLE files in that directory
  */
-vector<string> getTLEFiles(const string& directoryPath) {
+vector<string> TLEParser::getTLEFiles(const string& directoryPath) {
 	vector<string> tleFiles;
 
 	for (const auto& entry : filesystem::directory_iterator(directoryPath))
@@ -106,14 +124,14 @@ void TLEParser::parseTLEFile(const string& tlePath, vector<Tle> &observations, b
 	{
 		while (getline(inFile, tleLine1)) {
 			if (getline(inFile, tleLine2) && getline(inFile, tleLine3))
-				observations.emplace_back(_parse(tleLine1, tleLine2, tleLine3));
+				observations.emplace_back(parse(tleLine1, tleLine2, tleLine3));
 		}
 	}
 	else
 	{
 		while (getline(inFile, tleLine1)) {
 			if (getline(inFile, tleLine2))
-				observations.emplace_back(_parse(tleLine1, tleLine2));
+				observations.emplace_back(parse(tleLine1, tleLine2));
 		}
 	}
 
