@@ -14,6 +14,18 @@ COP3530 Data Structures &amp; Algorithm - Project 3
 The following section provides a summary of each custom class used in the project
 
 ## SatelliteCoverageTracker
+***
+This is the main class for this project and is used to run the process.
+
+```mermaid
+classDiagram
+class SatelliteCoverageTracker {
+    SatelliteCoverageTracker(pathToData, dateTime, location)
+}
+```
+
+### Construction
+- `SatelliteCoverageTracker()` - A constructor which takes in the path to the data directory, a date time to test for observations, and a location to filter the observations
 
 ## SatelliteCatalog
 ***
@@ -22,7 +34,7 @@ This class helps manage satellite catalog information so a satellite catalog num
 ```mermaid
 classDiagram
 class SatelliteCatalog {
-    SatelliteCatalog(dataDirectory) void
+    SatelliteCatalog(dataDirectory)
     getCatalogEntry(catNum) const CatalogEntry&
     count() int
 }
@@ -50,6 +62,12 @@ class CatalogEntry {
 }
 ```
 
+### Structs
+- `CatalogEntry` - A public struct that contains attributes associated with a catalog entry 
+
+### Enums
+- `RCS_Size` - An emum that is used to define the radar cross-section for the satellite
+
 ### Construction
 - `SatelliteCatalog()` - a constructor that takes in the path to the data directory where the catalog CSV can be found
 
@@ -73,39 +91,113 @@ class TLEParser {
 }
 ```
 
+### Static Methods
+- `parse(tleString)` - Takes in a string that contains newline characters to separate the three lines and returns a `Tle` object
+- `parse(line1, line2)` - Takes in two strings representing the primary data lines (omitting the optional name line) and returns a `Tle` object
+- `parse(line1, line2, line3)` - Takes in three strings representing a line that contains the name and the two primary data lines and returns a `Tle` object
+- `getCoordGeodetic(tle)` - Takes in a `Tle` object and returns a `CoordGeodetic` object representing the position of the object at the time of observation
+- `getCoordGeodetic(line1, line2)` - Takes in two strings representing the primary data lines and omits the optional name line and returns a `CoordGeodetic` object representing the position of the object at the time of observation
+- `getCoordGeodetic(line1, line2, line2)`- Takes in three strings representing the name and the two primary data lines and returns a `CoordGeodetic` object representing the position of the object at the time of observation
+
 ## DataModel Class
 ***
 This is a template class which both the LinearModel and GraphModel classes inherit from.
 
+```mermaid
+classDiagram
+class DateModel {
+    DataModel(directory)
+    import()*
+    insert(tle)*
+    search(position, radius)* vector<int>
+}
+```
+
 ### Construction
-- `DataModel()` - a constructor that takes in a path to the directory where the data files are located
+- `DataModel(directory)` - a constructor that takes in a path to the directory where the data files are located
 
 ### Pure Virtual Functions
 - `import()` - performs the data import process
-- `insert()` - takes in a reference to a Tle object and inserts it into the data structure
-- `search()` - takes in a position and a radius used to perform the search for matching data points
+- `insert(tle)` - takes in a reference to a `Tle` object and inserts it into the data structure
+- `search(position, radius)` - takes in a position and a radius used to perform the search for matching data points
 
 ## GraphModel Class
 ***
+A class that represents Tle observations in a Graph data structure and supports a method to search for observations that passed over a given position within a radius of that position
+
+```mermaid
+classDiagram
+class GraphModel {
+    GraphModel(directory, sepThresh)
+    import()
+    insert(tle)
+    search(position, radius) vector<int>
+    testFindClosestWaypoint(dataDirectory, wpSepThresh, pos, refWaypoint)$ bool
+    testFindClosestWaypoint(dataDirectory, wpSepThresh, pos, waypoints, refWaypoint)$ bool
+    testInsert(dataDirectory, wpSepThresh, tle, refVertex)$ bool
+}
+class Vertex {
+    index int
+    isWaypoint bool
+    position CoordGeodetic
+    operator==(rhs)
+}
+class Edge {
+    index int
+    weight double
+}
+```
+
+### Structs
+- `Vertex` - A public struct that represent a node or vertex in the graph
+- `Edge` - A public struct that represents a connection between vertices in the graph
+
 ### Construction
-- `GraphModel()` - constructor that takes in a path to the data directory and a waypoint separation threshold
+- `GraphModel(directory, sepThresh)` - constructor that takes in a path to the data directory and a waypoint separation threshold
 
 ### Mutators
 - `import()` - Performs the import process for all .tle files found in the data directory
 - `insert()` - Inserts a single data point into the data structure
 
 ### Accessors
-- `search()` - performs a search of the data structure to find datapoint that are in range relative to a position
+- `search(position, radius)` - performs a search of the data structure to find datapoint that are in range relative to a position
 
 ### Static Tests
 - `testFindClosestWaypoint()` - Takes in a position, checks the positions and inserts a waypoint because one does not exist, then compares the waypoint to a reference
-- `testFindClosestWaypoint()` - Takes in a position and and a vector of waypoints, and compares the closes waypoint to a reference waypoint
+- `testFindClosestWaypoint()` - Takes in a position and a vector of waypoints, and compares the closes waypoint to a reference waypoint
 - `testInsert()` - Tests inserting a two line element into the Graph and compares the Vertex that was generated to a reference vertex
 
 ## LinearModel Class
+***
+```mermaid
+classDiagram
+class LinearModel {
+    
+}
+```
+
+### Construction
+
+### Mutators
+
+### Accessors
+
+### Static Tests
 
 ## Utility Class
-- `getDistance()` - computes the haversine distance between two geodetic coordinate positions
+***
+A utility class that contains some common helpfully functions that are used throughout the project
+
+```mermaid
+classDiagram
+class Utility {
+    double EARTH_RADIUS$
+    getDistance(pos1, pos2)$ double
+}
+```
+
+### Static Methods
+- `getDistance(pos1, pos2)` - computes the haversine distance between two geodetic coordinate positions
 
 # Library Documentation
 ***
