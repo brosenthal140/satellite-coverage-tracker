@@ -1,4 +1,5 @@
 #include <limits>
+#include <algorithm>
 #include "GraphModel.h"
 #include "TLEParser.h"
 #include "Utility.h"
@@ -18,6 +19,21 @@ bool GraphModel::Vertex::operator==(const Vertex &rhs) const
 	{
 		return this->position == rhs.position;
 	}
+	else
+		return false;
+}
+
+/* ============== Edge STRUCT =============== */
+/* ============= PUBLIC OPERATORS ============= */
+/**
+ * Equality operator for the Edge struct
+ * @param rhs the reference to compare the invoking object to
+ * @return a boolean value indicating if the two structs are equal
+ */
+bool GraphModel::Edge::operator==(const Edge &rhs) const
+{
+	if (this->index == rhs.index)
+		return this->weight == rhs.weight;
 	else
 		return false;
 }
@@ -135,6 +151,20 @@ bool GraphModel::testInsert(string &dataDirectory, const double &wpSepThresh, co
 	auto vertex = graph._vertices[0];
 
 	return refVertex == vertex;
+}
+
+/**
+ * Tests the _filterByWeight() function
+ * @param edges a reference to the vector of edges to be filtered
+ * @param maxWeight the value used to determine the filtering
+ * @param refEdges a reference to the vector of edges used to determine if the test passed
+ * @return a boolean value indicating if the test passes
+ */
+bool GraphModel::testFilterEdges(const vector<Edge> &edges, const double &maxWeight, const vector<Edge> &refEdges)
+{
+	auto filteredEdges = GraphModel::_filterByWeight(edges, maxWeight);
+
+	return (filteredEdges.size() == refEdges.size()) && equal(refEdges.begin(), refEdges.end(), filteredEdges.begin());
 }
 
 
@@ -401,4 +431,22 @@ unordered_set<int> GraphModel::_findWaypointsWithinRange(const CoordGeodetic &po
 unordered_set<int> GraphModel::_filterCluster(const Vertex &waypoint, const double &range)
 {
 	// TODO: Implement the _filterCluster() function in the GraphModel class
+	// Get the edges for the waypoint
+	auto edges = _vertexAdjList[waypoint.index];
+
+
+}
+
+/* ========== PRIVATE HELPER METHODS ========== */
+/**
+ * Takes in a vector of edges and returns a filtered vector containing edges that are below a max weight
+ * @param edges the vector of edges to filter
+ * @param maxWeight the maximum value for an edge weight
+ * @return a vector of edges
+ */
+vector<GraphModel::Edge> GraphModel::_filterByWeight(const vector<Edge> &edges, const double &maxWeight)
+{
+	vector<Edge> filteredEdges;
+	copy_if(edges.begin(), edges.end(), back_inserter(filteredEdges), [&maxWeight] (Edge e) { return e.weight < maxWeight; });
+	return filteredEdges;
 }

@@ -74,3 +74,29 @@ TEST_CASE("Insert an observation", "[GraphModel][Insert]")
 
 	REQUIRE(GraphModel::testInsert(dataDirectory, wpSepThreshDeg, tle, vertex));
 }
+
+TEST_CASE("Filter edges by weight", "[GraphModel][Search]")
+{
+	const vector<GraphModel::Edge> edges = {
+			{ 0, 10 },
+			{ 1, 2 },
+			{ 2, 3 },
+			{ 3, 5 },
+			{ 4, 6 },
+			{ 5, 1 },
+			{ 6, 1 },
+			{ 7, 5 },
+			{ 8, 3 },
+			{ 9, 10 }
+	};
+	const double maxWeight = 5;
+	const vector<GraphModel::Edge> refEdges = {
+			{ 1, 2 },
+			{ 2, 3 },
+			{ 5, 1 },
+			{ 6, 1 },
+			{ 8, 3 },
+	};
+
+	REQUIRE(GraphModel::testFilterEdges(edges, maxWeight, refEdges));
+}

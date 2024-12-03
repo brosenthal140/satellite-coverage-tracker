@@ -24,6 +24,8 @@ public:
 	struct Edge {
 		int index;
 		double weight;
+
+		bool operator==(const Edge &rhs) const;
 	};
 
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
@@ -40,6 +42,7 @@ public:
 	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint);
 	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint);
 	static bool testInsert(string &dataDirectory, const double &wpSepThresh, const Tle &tle, const Vertex &refVertex);
+	static bool testFilterEdges(const vector<Edge> &edges, const double &maxWeight, const vector<Edge> &refEdges);
 
 private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
@@ -74,4 +77,7 @@ private:
 	unordered_set<int> _findVerticesWithinRange(const CoordGeodetic &pos, const double &range);
 	unordered_set<int> _findWaypointsWithinRange(const CoordGeodetic &pos, const double &range);
 	unordered_set<int> _filterCluster(const Vertex &waypoint, const double &range);
+
+	/* ========== PRIVATE HELPER METHODS ========== */
+	static vector<Edge> _filterByWeight(const vector<Edge> &edges, const double &maxWeight);
 };
