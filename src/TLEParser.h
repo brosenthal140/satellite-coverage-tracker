@@ -14,10 +14,9 @@ private:
 	static Tle _parse(const string &line1, const string &line2);
 
 public:
+	/* =========== PUBLIC METHODS ============ */
 	bool fetchTLEDataFromFile(const std::string& inputFilePath, const std::string& outputPath);
 	void parseTLE(const std::string& tlePath);
-	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-	TLEParser() = default;
 
 	/* ========== PUBLIC STATIC METHODS ========== */
 	static Tle parse(const string &tleString);
@@ -27,4 +26,6 @@ public:
 	static CoordGeodetic getCoordGeodetic(const Tle &tle);
 	static CoordGeodetic getCoordGeodetic(const string &line1, const string &line2, const string &line3);
 	static CoordGeodetic getCoordGeodetic(const string &line1, const string &line2);
+
+	static vector<string> getTLEFiles(const string &directoryPath);
 };
