@@ -100,3 +100,22 @@ TEST_CASE("Filter edges by weight", "[GraphModel][Search]")
 
 	REQUIRE(GraphModel::testFilterEdges(edges, maxWeight, refEdges));
 }
+
+TEST_CASE("Search for observations relative to position and within a range", "[GraphModel][Search]")
+{
+	// Parameters for test
+	string dataDirectory = "../data";
+	double wpSepThreshDeg = 0.9;
+
+	// Example Tle
+	string line1 = "ISS (ZARYA)";
+	string line2 = "1 25544U 98067A   24336.59759280  .00020297  00000-0  36103-3 0  9999";
+	string line3 = "2 25544  51.6397 205.9875 0006915 289.9483 151.1375 15.50113255484516";
+
+	// Create a Tle object from the example
+
+	// Generate several Tle observations with different time since observation
+	// TODO: Complete test of search function
+
+
+}

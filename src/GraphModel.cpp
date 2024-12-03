@@ -79,11 +79,37 @@ void GraphModel::insert(const Tle &tle)
  */
 vector<int> GraphModel::search(const CoordGeodetic &position, const double &radius)
 {
-	// TODO: Implement search() function
 	// Traverse the wpAdjList to find any other waypoints that are in range
 	auto waypoints = _findWaypointsWithinRange(position, radius);
 
+	// For each waypoint filter the associated cluster to find candidate vertices
+	unordered_set<int> candidates;
+	for (const auto &wpIndex: waypoints)
+	{
+		auto tempCandidates = _filterCluster(wpIndex, radius);
 
+		candidates.insert(tempCandidates.begin(), tempCandidates.end());
+	}
+
+	// For each candidate verify the actual distance between the position and the candidate and filter indices whose distance from the candidate is below the radius threshold
+	double distance;
+	CoordGeodetic tempPos;
+	unordered_set<int> filteredCandidates;
+	for (const auto &index: candidates)
+	{
+		tempPos = _vertices[index].position;
+		distance = Utility::getDistance(position, tempPos);
+
+		if (distance < radius)
+			filteredCandidates.insert(index);
+	}
+
+	// For each of the filtered candidates, look it up in _observations map to get the original Tle object
+	vector<int> catalogNumbers(filteredCandidates.size());
+	for (const auto &filteredIndex : filteredCandidates)
+		catalogNumbers.emplace_back(_observations.at(filteredIndex).NoradNumber());
+
+	return catalogNumbers;
 }
 
 
@@ -165,6 +191,22 @@ bool GraphModel::testFilterEdges(const vector<Edge> &edges, const double &maxWei
 	auto filteredEdges = GraphModel::_filterByWeight(edges, maxWeight);
 
 	return (filteredEdges.size() == refEdges.size()) && equal(refEdges.begin(), refEdges.end(), filteredEdges.begin());
+}
+
+bool GraphModel::testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius, const vector<int> &refSatCatNums)
+{
+	// Create an instance of the GraphModel class
+	GraphModel graph(dataDirectory, wpSepThresh);
+
+	// For each observation in observations, insert it into the graph
+	for (const auto &tle : observations)
+		graph.insert(tle);
+
+	// Perform the search
+	auto result = graph.search(pos, radius);
+
+	// Compare the search result to the refSatCatNums
+	return (result.size() == refSatCatNums.size()) && equal(refSatCatNums.begin(), refSatCatNums.end(), result.begin());
 }
 
 
@@ -428,10 +470,10 @@ unordered_set<int> GraphModel::_findWaypointsWithinRange(const CoordGeodetic &po
  * @param range the value to filter the edges to associated with a waypoint
  * @return a set containing the indices that are within range of the waypoint
  */
-unordered_set<int> GraphModel::_filterCluster(const Vertex &waypoint, const double &range)
+unordered_set<int> GraphModel::_filterCluster(const int &wpIndex, const double &range)
 {
 	// Get the edges for the waypoint
-	auto edges = _vertexAdjList[waypoint.index];
+	auto edges = _vertexAdjList[wpIndex];
 	auto filteredEdges = _filterByWeight(edges, 2 * range); // 2 * range is used to capture all vertices that could be in range
 
 	// Create a set of the indices
