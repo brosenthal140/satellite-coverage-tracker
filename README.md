@@ -141,7 +141,7 @@ A class that represents Tle observations in a Graph data structure and supports 
 ```mermaid
 classDiagram
 class GraphModel {
-    GraphModel(directory, sepThresh)
+    GraphModel(directory)
     import()
     insert(tle)
     search(position, radius) unordered_set<int>
@@ -169,7 +169,7 @@ class Edge {
 - `Edge` - A public struct that represents a connection between vertices in the graph
 
 ### Construction
-- `GraphModel(directory, sepThresh)` - constructor that takes in a path to the data directory and a waypoint separation threshold
+- `GraphModel(directory)` - constructor that takes in a path to the data directory
 
 ### Mutators
 - `import()` - Performs the import process for all .tle files found in the data directory

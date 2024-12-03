@@ -9,18 +9,16 @@ using namespace libsgp4;
 
 TEST_CASE("Check for a waypoint for a new graph", "[GraphModel][Waypoint][Search]")
 {
-	double wpSepThreshDeg = 2000; // kilometers
 	string dataDirectory = "../data";
 
 	CoordGeodetic position(0.0, 0.0, 0.0, false);
 	GraphModel::Vertex refVertex = { 0, true, position };
 
-	REQUIRE(GraphModel::testFindClosestWaypoint(dataDirectory, wpSepThreshDeg, position, refVertex));
+	REQUIRE(GraphModel::testFindClosestWaypoint(dataDirectory, position, refVertex));
 }
 
 TEST_CASE("Check for a waypoint when one already exists", "[GraphModel][Waypoint][Search]")
 {
-	double wpSepThreshDeg = 2000; // kilometers
 	string dataDirectory = "../data";
 
 	vector<CoordGeodetic> positions = {
@@ -34,13 +32,12 @@ TEST_CASE("Check for a waypoint when one already exists", "[GraphModel][Waypoint
 
 	for (int i = 0; i < positions.size(); i++)
 	{
-		REQUIRE(GraphModel::testFindClosestWaypoint(dataDirectory, wpSepThreshDeg, positions[i], refVertices[i]));
+		REQUIRE(GraphModel::testFindClosestWaypoint(dataDirectory, positions[i], refVertices[i]));
 	}
 }
 
 TEST_CASE("Get the waypoint nearest to a position", "[GraphModel][Waypoint][Search]")
 {
-	double wpSepThreshDeg = 2000; // kilometers
 	string dataDirectory = "../data";
 	vector<CoordGeodetic> wpPositions = {
 			{ 0, 0, 0, true },
@@ -57,7 +54,7 @@ TEST_CASE("Get the waypoint nearest to a position", "[GraphModel][Waypoint][Sear
 	};
 
 	// Test the waypoints to add them to the graph
-	REQUIRE(GraphModel::testFindClosestWaypoint(dataDirectory, wpSepThreshDeg, refPosition, wpPositions, refWaypoint));
+	REQUIRE(GraphModel::testFindClosestWaypoint(dataDirectory, refPosition, wpPositions, refWaypoint));
 }
 
 TEST_CASE("Insert an observation", "[GraphModel][Insert]")
@@ -70,10 +67,9 @@ TEST_CASE("Insert an observation", "[GraphModel][Insert]")
 
 	// Parameters for test
 	string dataDirectory = "../data";
-	double wpSepThreshDeg = 2000; // kilometers
 	const GraphModel::Vertex vertex = { 0, false, { 0.88899156265206469, -0.073645485312217928, 426.37173319160553, true }};
 
-	REQUIRE(GraphModel::testInsert(dataDirectory, wpSepThreshDeg, tle, vertex));
+	REQUIRE(GraphModel::testInsert(dataDirectory, tle, vertex));
 }
 
 TEST_CASE("Filter edges by weight", "[GraphModel][Search]")
@@ -107,7 +103,6 @@ TEST_CASE("Search for observations relative to position and within a range for 1
 	// Parameters for test
 	string dataDirectory = "../data";
 	string pathToTestFile = "../data/test_files/test_01.tle";
-	double wpSepThreshDeg = 2000; // kilometers
 	CoordGeodetic pos = { 0, 158.925, 561.694, false };
 	double radius = 10; // units: km
 	unordered_set<int> refCatNums = { 12 };
@@ -134,7 +129,7 @@ TEST_CASE("Search for observations relative to position and within a range for 1
 			}
 		}
 
-		auto catNums = GraphModel::testSearch(dataDirectory, wpSepThreshDeg, tleObjs, pos, radius);
+		auto catNums = GraphModel::testSearch(dataDirectory, tleObjs, pos, radius);
 
 		// Print out the category numbers for debugging
 		for (const auto &catNum : catNums)
@@ -155,7 +150,6 @@ TEST_CASE("Search for observations relative to position and within a range for 5
 	// Parameters for test
 	string dataDirectory = "../data";
 	string pathToTestFile = "../data/test_files/test_02.tle";
-	double wpSepThreshDeg = 2000; // kilometers
 	CoordGeodetic pos = { 0, 153, 0, false };
 	double radius = 700; // units: km
 	unordered_set<int> refCatNums = { 12, 29, 51, 85, 115 };
@@ -182,7 +176,7 @@ TEST_CASE("Search for observations relative to position and within a range for 5
 			}
 		}
 
-		auto catNums = GraphModel::testSearch(dataDirectory, wpSepThreshDeg, tleObjs, pos, radius);
+		auto catNums = GraphModel::testSearch(dataDirectory, tleObjs, pos, radius);
 
 		// Print out the category numbers for debugging
 		for (const auto &catNum : catNums)
@@ -203,7 +197,6 @@ TEST_CASE("Search for observations relative to position and within a range for 1
 	// Parameters for test
 	string dataDirectory = "../data";
 	string pathToTestFile = "../data/test_files/test_03.tle";
-	double wpSepThreshDeg = 2000; // kilometers
 	CoordGeodetic pos = { 29.649294, -82.339383, 0, false }; // Lat, Long of Tigert hall
 	double radius = 1000; // units: km
 	unordered_set<int> refCatNums = { 340, 414, 549, 745, 561, 446, 657, 268, 406, 544, 659, 648, 672, 660, 405, 704, 224, 753 };
@@ -230,7 +223,7 @@ TEST_CASE("Search for observations relative to position and within a range for 1
 			}
 		}
 
-		auto catNums = GraphModel::testSearch(dataDirectory, wpSepThreshDeg, tleObjs, pos, radius);
+		auto catNums = GraphModel::testSearch(dataDirectory, tleObjs, pos, radius);
 
 		// Print out the category numbers for debugging
 		for (const auto &catNum : catNums)
@@ -248,8 +241,7 @@ TEST_CASE("Search for observations relative to position and within a range for 1
 TEST_CASE("Import all the TLE data in the data directory", "[GraphModel][Import]")
 {
 	string dataDirectory = "../data";
-	double wpSepThreshDeg = 2000; // kilometers
 
 	// Perform the import
-	REQUIRE_NOTHROW(GraphModel::testImport(dataDirectory, wpSepThreshDeg));
+	REQUIRE_NOTHROW(GraphModel::testImport(dataDirectory));
 }
