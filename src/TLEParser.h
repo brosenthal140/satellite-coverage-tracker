@@ -5,7 +5,8 @@
 using namespace std;
 using namespace libsgp4;
 
-class TLEParser {
+struct TLEParser {
+private: 	
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
 
 	/* ========== PRIVATE METHODS ========== */
@@ -13,6 +14,8 @@ class TLEParser {
 	static Tle _parse(const string &line1, const string &line2);
 
 public:
+	bool fetchTLEDataFromFile(const std::string& inputFilePath, const std::string& outputPath);
+	void parseTLE(const std::string& tlePath);
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
 	TLEParser() = default;
 

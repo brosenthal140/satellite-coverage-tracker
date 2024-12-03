@@ -99,6 +99,13 @@ class TLEParser {
 - `getCoordGeodetic(line1, line2)` - Takes in two strings representing the primary data lines and omits the optional name line and returns a `CoordGeodetic` object representing the position of the object at the time of observation
 - `getCoordGeodetic(line1, line2, line2)`- Takes in three strings representing the name and the two primary data lines and returns a `CoordGeodetic` object representing the position of the object at the time of observation
 
+## Data Ingestion
+Feature uses  `TLEParser` and `SatelliteCoverageTracker` classes to load and process satellite data from TLE files.
+
+### Usage
+1. Place your TLE files in the `data/` directory.
+2. Run the main program to parse and ingest the TLE data.
+
 ## DataModel Class
 ***
 This is a template class which both the LinearModel and GraphModel classes inherit from.
