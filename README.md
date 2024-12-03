@@ -189,6 +189,8 @@ class LinearModel {
     import()
     insert(tle)
     search(position, radius) unordered_set<int>
+    testInsert(dataDirectory, tle)$ bool
+    testSearch(dataDirectory, observations, pos, radius)$ unordered_set<int>
 }
 ```
 
@@ -204,6 +206,7 @@ class LinearModel {
 
 ### Static Tests
 - `testInsert(dataDirectory, tle)` - Tests the `insert()` method for the `LinearModel` class
+- `testSearch()` - Tests the `search()` function for the `LinearModel` class
 
 ## Utility Class
 ***
