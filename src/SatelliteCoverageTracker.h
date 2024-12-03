@@ -12,7 +12,7 @@ public:
 	SatelliteCoverageTracker(string pathToData, const CoordGeodetic &location, const double &radius);
 	~SatelliteCoverageTracker();
 
-	/* ========== PUBLIC METHODS ========== */
+	/* ========== PUBLIC STATIC METHODS ========== */
 	static void runCLI();
 
 private:
@@ -28,5 +28,6 @@ private:
 	/* ========== PRIVATE HELPER FUNCTIONS ========== */
 	void _importData();
 	void _initModel(DataModel *model);
+	unordered_set<int> _performSearch(DataModel *model);
 };
 
