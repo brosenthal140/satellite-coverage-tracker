@@ -1,5 +1,4 @@
 # satellite-coverage-tracker
-***
 COP3530 Data Structures &amp; Algorithm - Project 3
 
 **Group Name:** The Orbital Police
@@ -7,28 +6,28 @@ COP3530 Data Structures &amp; Algorithm - Project 3
 **Group Members:** Kamarii Austin, Ryan McGlinn, Brandon Rosenthal
 
 # Start Here
-***
 
 # Class Documentation
-***
 The following section provides a summary of each custom class used in the project
 
 ## SatelliteCoverageTracker
-***
 This is the main class for this project and is used to run the process.
 
 ```mermaid
 classDiagram
 class SatelliteCoverageTracker {
     SatelliteCoverageTracker(pathToData, location, radius)
+    ~SatelliteCoverageTracker()
+    runCLI()$
 }
 ```
 
 ### Construction
 - `SatelliteCoverageTracker()` - A constructor which takes in the path to the data directory, a location, and radius to filter the observations
+- `~SatelliteCoverageTracker()` - Destructor for the class
+- `runCLI()` - A static method which runs the process to use the `SatelliteCoverageTracker` class to find observations for a given location and radius
 
 ## SatelliteCatalog
-***
 This class helps manage satellite catalog information so a satellite catalog number from a TLE observation can be correlated.
 
 ```mermaid
@@ -76,7 +75,6 @@ class CatalogEntry {
 - `count()` - returns the count of catalog entries in the catalog
 
 ## TLEParser Class
-***
 This is a class which wraps certain methods exposed by the libsgp4 library to parse and get the geodetic location for a two line element
 
 ```mermaid
@@ -113,21 +111,22 @@ Feature uses  `TLEParser` and `SatelliteCoverageTracker` classes to load and pro
 2. Run the main program to parse and ingest the TLE data.
 
 ## DataModel Class
-***
 This is a template class which both the LinearModel and GraphModel classes inherit from.
 
 ```mermaid
 classDiagram
 class DateModel {
     DataModel(directory)
+    ~DataModel()*
     import()*
     insert(tle)*
     search(position, radius)* unordered_set<int>
 }
 ```
 
-### Construction
+### Construction & Destruction
 - `DataModel(directory)` - a constructor that takes in a path to the directory where the data files are located
+- `~DataModel()` - a pure virtual destruction for the class
 
 ### Pure Virtual Functions
 - `import()` - performs the data import process
@@ -135,13 +134,13 @@ class DateModel {
 - `search(position, radius)` - takes in a position and a radius used to perform the search for matching data points
 
 ## GraphModel Class
-***
 A class that represents Tle observations in a Graph data structure and supports a method to search for observations that passed over a given position within a radius of that position
 
 ```mermaid
 classDiagram
 class GraphModel {
     GraphModel(directory)
+    ~GraphModel()
     import()
     insert(tle)
     search(position, radius) unordered_set<int>
@@ -168,8 +167,9 @@ class Edge {
 - `Vertex` - A public struct that represent a node or vertex in the graph
 - `Edge` - A public struct that represents a connection between vertices in the graph
 
-### Construction
+### Construction & Destruction
 - `GraphModel(directory)` - constructor that takes in a path to the data directory
+- `~GraphModel()` - a destructor for the class
 
 ### Mutators
 - `import()` - Performs the import process for all .tle files found in the data directory
@@ -187,13 +187,13 @@ class Edge {
 - `testImport()` - Tests the `import()` function to check if the process throws any errors
 
 ## LinearModel Class
-***
 A class that represents TLE observations in a simple map structure. It supports the public methods outlined in the DataModel class.
 
 ```mermaid
 classDiagram
 class LinearModel {
     LinearModel(dataDirectory)
+    ~LinearModel()
     import()
     insert(tle)
     search(position, radius) unordered_set<int>
@@ -202,8 +202,9 @@ class LinearModel {
 }
 ```
 
-### Construction
+### Construction & Destruction
 - `LinearModel()` - A constructor that takes in a string representing the path to the data directory
+- `~LinearModel()` - A destructor for the class
 
 ### Mutators
 - `import()` - Inserts all the observations found in all the .tle files in the data directory
@@ -217,7 +218,6 @@ class LinearModel {
 - `testSearch()` - Tests the `search()` function for the `LinearModel` class
 
 ## Utility Class
-***
 A utility class that contains some common helpfully functions that are used throughout the project
 
 ```mermaid
@@ -232,7 +232,6 @@ class Utility {
 - `getDistance(pos1, pos2)` - computes the haversine distance (in kilometers) between two geodetic coordinate positions
 
 # Library Documentation
-***
 The following section describes external libraries that are used in this project
 
 ## libsgp4
