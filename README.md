@@ -116,7 +116,7 @@ class DateModel {
     DataModel(directory)
     import()*
     insert(tle)*
-    search(position, radius)* vector<int>
+    search(position, radius)* unordered_set<int>
 }
 ```
 
@@ -138,10 +138,12 @@ class GraphModel {
     GraphModel(directory, sepThresh)
     import()
     insert(tle)
-    search(position, radius) vector<int>
+    search(position, radius) unordered_set<int>
     testFindClosestWaypoint(dataDirectory, wpSepThresh, pos, refWaypoint)$ bool
     testFindClosestWaypoint(dataDirectory, wpSepThresh, pos, waypoints, refWaypoint)$ bool
     testInsert(dataDirectory, wpSepThresh, tle, refVertex)$ bool
+    testFilterEdges(edges, maxWeight, refEdges)$ bool
+    testSearch(dataDirectory, wpSepThresh, observations, pos, radius)$ unordered_set<int>
 }
 class Vertex {
     index int
@@ -173,6 +175,8 @@ class Edge {
 - `testFindClosestWaypoint()` - Takes in a position, checks the positions and inserts a waypoint because one does not exist, then compares the waypoint to a reference
 - `testFindClosestWaypoint()` - Takes in a position and a vector of waypoints, and compares the closes waypoint to a reference waypoint
 - `testInsert()` - Tests inserting a two line element into the Graph and compares the Vertex that was generated to a reference vertex
+- `testFilterEdges()` - Tests the `_filterByWeight()` function which filters a vector of edges to return the vertices index whose weight (distance) is below the max weight
+- `testSearch()` - Tests the `search()` function which searches for observations that occurred within range of a position during the observation period
 
 ## LinearModel Class
 ***
@@ -204,7 +208,7 @@ class Utility {
 ```
 
 ### Static Methods
-- `getDistance(pos1, pos2)` - computes the haversine distance between two geodetic coordinate positions
+- `getDistance(pos1, pos2)` - computes the haversine distance (in kilometers) between two geodetic coordinate positions
 
 # Library Documentation
 ***

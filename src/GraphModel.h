@@ -24,6 +24,8 @@ public:
 	struct Edge {
 		int index;
 		double weight;
+
+		bool operator==(const Edge &rhs) const;
 	};
 
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
@@ -34,12 +36,14 @@ public:
 	void insert(const Tle &tle) override;
 
 	/* ========== PUBLIC ACCESSORS ========== */
-	vector<int> search(const CoordGeodetic &position, const double &radius) override; // Returns a vector of the satellite catalog numbers
+	unordered_set<int> search(const CoordGeodetic &position, const double &radius) override; // Returns a vector of the satellite catalog numbers
 
 	/* ========== PUBLIC TEST METHODS ========== */
 	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint);
 	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint);
 	static bool testInsert(string &dataDirectory, const double &wpSepThresh, const Tle &tle, const Vertex &refVertex);
+	static bool testFilterEdges(const vector<Edge> &edges, const double &maxWeight, const vector<Edge> &refEdges);
+	static unordered_set<int> testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius);
 
 private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
@@ -53,8 +57,6 @@ private:
 
 	map<int, vector<Edge>> _wpAdjList;
 	unordered_set<int> _waypoints;
-	map<double, int> _wpLatMap;
-	map<double, int> _wpLongMap;
 	double _wpSeparation;
 	int _wpCount;
 
@@ -73,5 +75,8 @@ private:
 	int _findNearestWaypoint(const CoordGeodetic &pos, bool insertOnFailure);
 	unordered_set<int> _findVerticesWithinRange(const CoordGeodetic &pos, const double &range);
 	unordered_set<int> _findWaypointsWithinRange(const CoordGeodetic &pos, const double &range);
-	unordered_set<int> _filterCluster(const Vertex &waypoint, const double &range);
+	unordered_set<int> _filterCluster(const int &wpIndex, const double &range);
+
+	/* ========== PRIVATE HELPER METHODS ========== */
+	static vector<Edge> _filterByWeight(const vector<Edge> &edges, const double &maxWeight);
 };

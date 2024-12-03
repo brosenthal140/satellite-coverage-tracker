@@ -1,4 +1,5 @@
 #include <limits>
+#include <algorithm>
 #include "GraphModel.h"
 #include "TLEParser.h"
 #include "Utility.h"
@@ -18,6 +19,21 @@ bool GraphModel::Vertex::operator==(const Vertex &rhs) const
 	{
 		return this->position == rhs.position;
 	}
+	else
+		return false;
+}
+
+/* ============== Edge STRUCT =============== */
+/* ============= PUBLIC OPERATORS ============= */
+/**
+ * Equality operator for the Edge struct
+ * @param rhs the reference to compare the invoking object to
+ * @return a boolean value indicating if the two structs are equal
+ */
+bool GraphModel::Edge::operator==(const Edge &rhs) const
+{
+	if (this->index == rhs.index)
+		return this->weight == rhs.weight;
 	else
 		return false;
 }
@@ -61,13 +77,39 @@ void GraphModel::insert(const Tle &tle)
  * @param radius the range used to determine if a satellite is in range
  * @return a vector containing the unique catalog numbers of the satellites that are in range
  */
-vector<int> GraphModel::search(const CoordGeodetic &position, const double &radius)
+unordered_set<int> GraphModel::search(const CoordGeodetic &position, const double &radius)
 {
-	// TODO: Implement search() function
 	// Traverse the wpAdjList to find any other waypoints that are in range
 	auto waypoints = _findWaypointsWithinRange(position, radius);
 
+	// For each waypoint filter the associated cluster to find candidate vertices
+	unordered_set<int> candidates;
+	for (const auto &wpIndex: waypoints)
+	{
+		auto tempCandidates = _filterCluster(wpIndex, radius);
 
+		candidates.insert(tempCandidates.begin(), tempCandidates.end());
+	}
+
+	// For each candidate verify the actual distance between the position and the candidate and filter indices whose distance from the candidate is below the radius threshold
+	double distance;
+	CoordGeodetic tempPos;
+	unordered_set<int> filteredCandidates;
+	for (const auto &index: candidates)
+	{
+		tempPos = _vertices[index].position;
+		distance = Utility::getDistance(position, tempPos);
+
+		if (distance < radius)
+			filteredCandidates.insert(index);
+	}
+
+	// For each of the filtered candidates, look it up in _observations map to get the original Tle object
+	unordered_set<int> catalogNumbers(filteredCandidates.size());
+	for (const auto &filteredIndex : filteredCandidates)
+		catalogNumbers.insert(_observations.at(filteredIndex).NoradNumber());
+
+	return catalogNumbers;
 }
 
 
@@ -137,6 +179,45 @@ bool GraphModel::testInsert(string &dataDirectory, const double &wpSepThresh, co
 	return refVertex == vertex;
 }
 
+/**
+ * Tests the _filterByWeight() function
+ * @param edges a reference to the vector of edges to be filtered
+ * @param maxWeight the value used to determine the filtering
+ * @param refEdges a reference to the vector of edges used to determine if the test passed
+ * @return a boolean value indicating if the test passes
+ */
+bool GraphModel::testFilterEdges(const vector<Edge> &edges, const double &maxWeight, const vector<Edge> &refEdges)
+{
+	auto filteredEdges = GraphModel::_filterByWeight(edges, maxWeight);
+
+	return (filteredEdges.size() == refEdges.size()) && equal(refEdges.begin(), refEdges.end(), filteredEdges.begin());
+}
+
+/**
+ * Tests the search() function
+ * @param dataDirectory the path to the data source for the GraphModel
+ * @param wpSepThresh the threshold that causes a new waypoint to be generated
+ * @param observations a vector of Tle objects to insert into the graph
+ * @param pos the position to search for observations
+ * @param radius the range of positions from the position that are valid
+ * @return an unordered set containing the NORAD category numbers within range of the position
+ */
+unordered_set<int> GraphModel::testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius)
+{
+	// Create an instance of the GraphModel class
+	GraphModel graph(dataDirectory, wpSepThresh);
+
+	// For each observation in observations, insert it into the graph
+	for (const auto &tle : observations)
+		graph.insert(tle);
+
+	// Perform the search
+	auto result = graph.search(pos, radius);
+
+	// Compare the search result to the refSatCatNums
+	return result;
+}
+
 
 /* ========== PRIVATE INSERTION METHODS ========== */
 /**
@@ -183,9 +264,9 @@ const GraphModel::Vertex& GraphModel::_insertWaypoint(const CoordGeodetic &pos)
 	_wpCount++;
 	_waypoints.insert(wpIndex);
 
-	// Adds the information about the new waypoint
-	_wpLatMap.insert({ pos.latitude, wpIndex });
-	_wpLongMap.insert({ pos.longitude, wpIndex});
+	// Initialize the waypoint in the waypoint adjacency list
+	vector<Edge> edges;
+	_wpAdjList[wpIndex] = edges;
 
 	// Connect the new waypoint to all the other waypoint
 	_connectWaypoint(wpIndex);
@@ -398,7 +479,32 @@ unordered_set<int> GraphModel::_findWaypointsWithinRange(const CoordGeodetic &po
  * @param range the value to filter the edges to associated with a waypoint
  * @return a set containing the indices that are within range of the waypoint
  */
-unordered_set<int> GraphModel::_filterCluster(const Vertex &waypoint, const double &range)
+unordered_set<int> GraphModel::_filterCluster(const int &wpIndex, const double &range)
 {
-	// TODO: Implement the _filterCluster() function in the GraphModel class
+	// Get the edges for the waypoint
+	auto edges = _vertexAdjList[wpIndex];
+	auto filteredEdges = _filterByWeight(edges, 2 * range); // 2 * range is used to capture all vertices that could be in range
+
+	// Create a set of the indices
+	unordered_set<int> indices;
+	for (const auto &edge: filteredEdges)
+	{
+		indices.insert(edge.index);
+	}
+
+	return indices;
+}
+
+/* ========== PRIVATE HELPER METHODS ========== */
+/**
+ * Takes in a vector of edges and returns a filtered vector containing edges that are below a max weight
+ * @param edges the vector of edges to filter
+ * @param maxWeight the maximum value for an edge weight
+ * @return a vector of edges
+ */
+vector<GraphModel::Edge> GraphModel::_filterByWeight(const vector<Edge> &edges, const double &maxWeight)
+{
+	vector<Edge> filteredEdges;
+	copy_if(edges.begin(), edges.end(), back_inserter(filteredEdges), [&maxWeight] (Edge e) { return e.weight < maxWeight; });
+	return filteredEdges;
 }
