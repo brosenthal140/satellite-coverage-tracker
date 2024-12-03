@@ -180,20 +180,30 @@ class Edge {
 
 ## LinearModel Class
 ***
+A class that represents TLE observations in a simple map structure. It supports the public methods outlined in the DataModel class.
+
 ```mermaid
 classDiagram
 class LinearModel {
-    
+    LinearModel(dataDirectory)
+    import()
+    insert(tle)
+    search(position, radius) unordered_set<int>
 }
 ```
 
 ### Construction
+- `LinearModel()` - A constructor that takes in a string representing the path to the data directory
 
 ### Mutators
+- `import()` - Inserts all the observations found in all the .tle files in the data directory
+- `insert(tle)` - Inserts an observation into the data structure
 
 ### Accessors
+- `search(position, radius)` - Returns observations that were within the radius of a given position at the time of observation
 
 ### Static Tests
+- `testInsert(dataDirectory, tle)` - Tests the `insert()` method for the `LinearModel` class
 
 ## Utility Class
 ***
