@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <filesystem>
 #include "TLEParser.h"
 using namespace std;
 
@@ -51,56 +52,74 @@ CoordGeodetic TLEParser::getCoordGeodetic(const string &line1, const string &lin
 	return TLEParser::getCoordGeodetic(tle);
 }
 
-bool TLEParser::fetchTLEDataFromFile(const string& inputFilePath, const string& outputPath) {
-	//-------- takes input and output from file ------------//
-	ifstream inFile(inputFilePath);
-	ofstream outFile(outputPath);
+/**
+ * Returns the file paths to all the files with the .tle extension in the directory
+ * @param directoryPath the directory to search for files
+ * @return a vector of strings representing the paths to the TLE files in that directory
+ */
+vector<string> getTLEFiles(const string& directoryPath) {
+	vector<string> tleFiles;
 
-	//-------- checks to see if input and output files are opened, if not, print statement ------//
-	if (!inFile.is_open() || !outFile.is_open()) {
-		string statement1, statement2;
-		statement1 = "Open input failed: ", statement2 = " Open output failed: ";
-		if (!inFile.is_open()) {
-			cerr << statement1 << inputFilePath << endl;
+	for (const auto& entry : filesystem::directory_iterator(directoryPath))
+	{
+		if (entry.is_regular_file() && entry.path().extension() == ".tle")
+		{
+			tleFiles.push_back(entry.path().string());
 		}
-		if (!outFile.is_open()) {
-			cerr << statement2 << outputPath << endl;
-		}
-		return false;
 	}
 
-	outFile << inFile.rdbuf();  
-
-	inFile.close();
-	outFile.close();
-
-	return true;
+	return tleFiles;
 }
 
-void TLEParser::parseTLE(const string& tlePath) {
+/**
+ * Processes a file and outputs a vector of Tle objects
+ * @param tlePath the path to the TLE file
+ * @param isThreeLine indicates if the format is two-line element or three-line element
+ * @return a vector of Tle objects
+ */
+vector<Tle> TLEParser::parseTLEFile(const string& tlePath, bool isThreeLine) {
+	vector<Tle> observations;
+
+	TLEParser::parseTLEFile(tlePath, observations, isThreeLine);
+
+	return observations;
+}
+
+/**
+ * Processes a file and inserts Tle objects into the vector passed as reference
+ * @param tlePath the path to the TLE file
+ * @param observations a reference to the vector where the observations should be inserted
+ * @param isThreeLine indicates if the format is two-line element or three-line element
+ */
+void TLEParser::parseTLEFile(const string& tlePath, vector<Tle> &observations, bool isThreeLine)
+{
 	//------Open checks, to print error if cannot --------//
 	ifstream inFile(tlePath);
 	if (!inFile.is_open()) {
-		string errorstatement;
-		errorstatement = "Can't open TLE file: ";
-		cerr << errorstatement << tlePath << endl;
-		return;
+		string errorMsg;
+		errorMsg = "Can't open TLE file: ";
+		cerr << errorMsg << tlePath << endl;
 	}
 
-	string objectName, tleLine1, tleLine2;
-	while (getline(inFile, objectName)) {
-		if (getline(inFile, tleLine1) && getline(inFile, tleLine2)) {
-			string ObjectName, TLE1, TLE2;
-			ObjectName = "Object Name: ", TLE1 = "TLE Line 1: ", TLE2 = "TLE Line 2: ";
-			//----- Output the description of Two Line Element -------//
-			cout << ObjectName << objectName << endl;
-			cout << TLE1 << tleLine1 << endl;
-			cout << TLE2 << tleLine2 << endl;
+	string tleLine1, tleLine2, tleLine3;
+	if (isThreeLine)
+	{
+		while (getline(inFile, tleLine1)) {
+			if (getline(inFile, tleLine2) && getline(inFile, tleLine3))
+				observations.emplace_back(_parse(tleLine1, tleLine2, tleLine3));
+		}
+	}
+	else
+	{
+		while (getline(inFile, tleLine1)) {
+			if (getline(inFile, tleLine2))
+				observations.emplace_back(_parse(tleLine1, tleLine2));
 		}
 	}
 
 	inFile.close();
 }
+
 
 /* =============== PRIVATE METHODS ===============
  * ---------------------------------------------- */
