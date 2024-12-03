@@ -203,6 +203,7 @@ class LinearModel {
 - `search(position, radius)` - Returns observations that were within the radius of a given position at the time of observation
 
 ### Static Tests
+- `testInsert(dataDirectory, tle)` - Tests the `insert()` method for the `LinearModel` class
 
 ## Utility Class
 ***
