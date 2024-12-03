@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "SGP4.h"
-
+#include "DataModel.h"
 using namespace std;
 using namespace libsgp4;
 
@@ -22,6 +22,7 @@ private:
 	string _pathToDataDirectory;
 	DateTime _dateTimeRef;
 	CoordGeodetic _locationRef;
+	DataModel* _dataModel;
 
 	/* ========== PRIVATE HELPER FUNCTIONS ========== */
 	void _importData();
