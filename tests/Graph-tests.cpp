@@ -102,7 +102,7 @@ TEST_CASE("Filter edges by weight", "[GraphModel][Search]")
 	REQUIRE(GraphModel::testFilterEdges(edges, maxWeight, refEdges));
 }
 
-TEST_CASE("Search for observations relative to position and within a range", "[GraphModel][Search]")
+TEST_CASE("Search for observations relative to position and within a range for 10 observations", "[GraphModel][Search]")
 {
 	// Parameters for test
 	string dataDirectory = "../data";
@@ -134,7 +134,61 @@ TEST_CASE("Search for observations relative to position and within a range", "[G
 			}
 		}
 
-		REQUIRE(GraphModel::testSearch(dataDirectory, wpSepThreshDeg, tleObjs, pos, radius, refCatNums));
+		auto catNums = GraphModel::testSearch(dataDirectory, wpSepThreshDeg, tleObjs, pos, radius);
+
+		// Print out the category numbers for debugging
+		for (const auto &catNum : catNums)
+			INFO(to_string(catNum));
+
+		REQUIRE(refCatNums == catNums);
+	}
+	else
+	{
+		INFO("Test file at path '" + pathToTestFile + "' could not be opened!");
+		REQUIRE(false);
+	}
+
+}
+
+TEST_CASE("Search for observations relative to position and within a range for 50 observations", "[GraphModel][Search]")
+{
+	// Parameters for test
+	string dataDirectory = "../data";
+	string pathToTestFile = "../data/test_02.tle";
+	double wpSepThreshDeg = 0.9;
+	CoordGeodetic pos = { 0, 153, 0, false };
+	double radius = 700; // units: km
+	unordered_set<int> refCatNums = { 12, 29, 51, 85, 115 };
+
+	// Ingest the file
+	vector<Tle> tleObjs;
+	ifstream file(pathToTestFile);
+	int count = 0;
+	if (file.is_open())
+	{
+		string line1, line2;
+		while (getline(file, line1))
+		{
+			if (getline(file, line2))
+			{
+				cout << "Observation #" << to_string(count);
+				auto tle = TLEParser::parse(line1, line2);
+				cout << " " << "NORAD CAT: " << tle.NoradNumber() << endl;
+				tleObjs.emplace_back(tle);
+				auto position = TLEParser::getCoordGeodetic(tle);
+				cout << position << endl << endl;
+
+				count++;
+			}
+		}
+
+		auto catNums = GraphModel::testSearch(dataDirectory, wpSepThreshDeg, tleObjs, pos, radius);
+
+		// Print out the category numbers for debugging
+		for (const auto &catNum : catNums)
+			INFO(to_string(catNum));
+
+		REQUIRE(refCatNums == catNums);
 	}
 	else
 	{

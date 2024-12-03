@@ -193,7 +193,16 @@ bool GraphModel::testFilterEdges(const vector<Edge> &edges, const double &maxWei
 	return (filteredEdges.size() == refEdges.size()) && equal(refEdges.begin(), refEdges.end(), filteredEdges.begin());
 }
 
-bool GraphModel::testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius, const unordered_set<int> &refSatCatNums)
+/**
+ * Tests the search() function
+ * @param dataDirectory the path to the data source for the GraphModel
+ * @param wpSepThresh the threshold that causes a new waypoint to be generated
+ * @param observations a vector of Tle objects to insert into the graph
+ * @param pos the position to search for observations
+ * @param radius the range of positions from the position that are valid
+ * @return an unordered set containing the NORAD category numbers within range of the position
+ */
+unordered_set<int> GraphModel::testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius)
 {
 	// Create an instance of the GraphModel class
 	GraphModel graph(dataDirectory, wpSepThresh);
@@ -206,7 +215,7 @@ bool GraphModel::testSearch(string &dataDirectory, const double &wpSepThresh, co
 	auto result = graph.search(pos, radius);
 
 	// Compare the search result to the refSatCatNums
-	return (result.size() == refSatCatNums.size()) && equal(refSatCatNums.begin(), refSatCatNums.end(), result.begin());
+	return result;
 }
 
 
