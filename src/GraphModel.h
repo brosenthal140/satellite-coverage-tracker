@@ -29,7 +29,7 @@ public:
 	};
 
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-	GraphModel(string &directory, const double &sepThresh);
+	GraphModel(string &directory);
 
 	/* ========== PUBLIC MUTATORS ========== */
 	void import() override;
@@ -39,12 +39,12 @@ public:
 	unordered_set<int> search(const CoordGeodetic &position, const double &radius) override; // Returns a vector of the satellite catalog numbers
 
 	/* ========== PUBLIC TEST METHODS ========== */
-	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint);
-	static bool testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint);
-	static bool testInsert(string &dataDirectory, const double &wpSepThresh, const Tle &tle, const Vertex &refVertex);
+	static bool testFindClosestWaypoint(string &dataDirectory, const CoordGeodetic &pos, const Vertex &refWaypoint);
+	static bool testFindClosestWaypoint(string &dataDirectory, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint);
+	static bool testInsert(string &dataDirectory, const Tle &tle, const Vertex &refVertex);
 	static bool testFilterEdges(const vector<Edge> &edges, const double &maxWeight, const vector<Edge> &refEdges);
-	static unordered_set<int> testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius);
-	static void testImport(string &dataDirectory, const double &wpSepThresh);
+	static unordered_set<int> testSearch(string &dataDirectory, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius);
+	static void testImport(string &dataDirectory);
 
 private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
@@ -58,7 +58,7 @@ private:
 
 	map<int, vector<Edge>> _wpAdjList;
 	unordered_set<int> _waypoints;
-	double _wpSeparation;
+	double _wpSeparation = 2000; // units: kilometers
 	int _wpCount;
 
 	/* ========== PRIVATE INSERTION METHODS ========== */

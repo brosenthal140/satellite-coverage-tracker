@@ -42,7 +42,7 @@ bool GraphModel::Edge::operator==(const Edge &rhs) const
 /* ============== GraphModel CLASS ============== */
 /* ---------------------------------------------- */
 /* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-GraphModel::GraphModel(string &directory, const double &sepThresh) : _dataDirectory(directory), _wpSeparation(sepThresh), _wpCount(0), _vertexCount(0), DataModel(directory) {}
+GraphModel::GraphModel(string &directory) : _dataDirectory(directory), _wpCount(0), _vertexCount(0), DataModel(directory) {}
 
 /* ========== PUBLIC MUTATORS ========== */
 /**
@@ -136,9 +136,9 @@ unordered_set<int> GraphModel::search(const CoordGeodetic &position, const doubl
  * @param refWaypoint the required value that must be returned for the test to pass
  * @return a boolean value indicating if the test passes
  */
-bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const Vertex &refWaypoint)
+bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const CoordGeodetic &pos, const Vertex &refWaypoint)
 {
-	GraphModel graph(dataDirectory, wpSepThresh);
+	GraphModel graph(dataDirectory);
 	auto wpIndex = graph._findNearestWaypoint(pos, true);
 	auto waypoint = graph._vertices[wpIndex];
 
@@ -154,9 +154,9 @@ bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const double &wp
  * @param refWaypoint the waypoint that should be returned
  * @return a boolean value indicating if the test passes
  */
-bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const double &wpSepThresh, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint)
+bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const CoordGeodetic &pos, const vector<CoordGeodetic> &waypoints, const Vertex &refWaypoint)
 {
-	GraphModel graph(dataDirectory, wpSepThresh);
+	GraphModel graph(dataDirectory);
 
 	// Insert the waypoints into the graph
 	for (const auto &wpPos : waypoints)
@@ -179,10 +179,10 @@ bool GraphModel::testFindClosestWaypoint(string &dataDirectory, const double &wp
  * @param refVertex a reference to a Vertex object used to test if the pass succeeded
  * @return a boolean value indicating if the test passes
  */
-bool GraphModel::testInsert(string &dataDirectory, const double &wpSepThresh, const Tle &tle, const Vertex &refVertex)
+bool GraphModel::testInsert(string &dataDirectory, const Tle &tle, const Vertex &refVertex)
 {
 	// Create an instance of the GraphModel class
-	GraphModel graph(dataDirectory, wpSepThresh);
+	GraphModel graph(dataDirectory);
 
 	// Insert an observation
 	graph.insert(tle);
@@ -216,10 +216,10 @@ bool GraphModel::testFilterEdges(const vector<Edge> &edges, const double &maxWei
  * @param radius the range of positions from the position that are valid
  * @return an unordered set containing the NORAD category numbers within range of the position
  */
-unordered_set<int> GraphModel::testSearch(string &dataDirectory, const double &wpSepThresh, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius)
+unordered_set<int> GraphModel::testSearch(string &dataDirectory, const vector<Tle> &observations, const CoordGeodetic &pos, const double &radius)
 {
 	// Create an instance of the GraphModel class
-	GraphModel graph(dataDirectory, wpSepThresh);
+	GraphModel graph(dataDirectory);
 
 	// For each observation in observations, insert it into the graph
 	for (const auto &tle : observations)
@@ -237,10 +237,10 @@ unordered_set<int> GraphModel::testSearch(string &dataDirectory, const double &w
  * @param dataDirectory the path to the data source for the GraphModel
  * @param wpSepThresh the threshold that causes a new waypoint to be generated
  */
-void GraphModel::testImport(string &dataDirectory, const double &wpSepThresh)
+void GraphModel::testImport(string &dataDirectory)
 {
 	// Create an instance of the GraphModel class
-	GraphModel graph(dataDirectory, wpSepThresh);
+	GraphModel graph(dataDirectory);
 
 	// Perform the import process
 	graph.import();
