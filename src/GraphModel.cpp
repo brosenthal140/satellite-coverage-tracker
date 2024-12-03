@@ -430,11 +430,18 @@ unordered_set<int> GraphModel::_findWaypointsWithinRange(const CoordGeodetic &po
  */
 unordered_set<int> GraphModel::_filterCluster(const Vertex &waypoint, const double &range)
 {
-	// TODO: Implement the _filterCluster() function in the GraphModel class
 	// Get the edges for the waypoint
 	auto edges = _vertexAdjList[waypoint.index];
+	auto filteredEdges = _filterByWeight(edges, 2 * range); // 2 * range is used to capture all vertices that could be in range
 
+	// Create a set of the indices
+	unordered_set<int> indices;
+	for (const auto &edge: filteredEdges)
+	{
+		indices.insert(edge.index);
+	}
 
+	return indices;
 }
 
 /* ========== PRIVATE HELPER METHODS ========== */
