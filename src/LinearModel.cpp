@@ -15,6 +15,12 @@ LinearModel::LinearModel(string &dataDirectory) : DataModel(dataDirectory), _dat
 void LinearModel::import()
 {
 	// TODO: Implement import() function in LinearModel class
+
+	// Get the .tle files at the _dataDirectory
+	auto filePaths = TLEParser::getTLEFiles(_dataDirectory);
+
+	// For each file, process the files and insert the TLE entries into the model
+
 }
 
 /**

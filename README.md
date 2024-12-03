@@ -82,9 +82,6 @@ This is a class which wraps certain methods exposed by the libsgp4 library to pa
 ```mermaid
 classDiagram
 class TLEParser {
-    fetchTLEDataFromFile(inputFilePath, outputPath) bool
-    parseTLE(tlePath)
-    
     parse(tleString)$ Tle
     parse(line1, line2)$ Tle
     parse(line1, line2, line3)$ Tle
@@ -92,6 +89,7 @@ class TLEParser {
     getCoordGeodetic(line1, line2)$ CoordGeodetic
     getCoordGeodetic(line1, line2, line3)$ CoordGeodetic
     getTLEFiles(directoryPath)$ vector<string>
+    parseTLEFile(tlePath, isThreeLine)$ vector<Tle>
 }
 ```
 
@@ -103,6 +101,7 @@ class TLEParser {
 - `getCoordGeodetic(line1, line2)` - Takes in two strings representing the primary data lines and omits the optional name line and returns a `CoordGeodetic` object representing the position of the object at the time of observation
 - `getCoordGeodetic(line1, line2, line2)`- Takes in three strings representing the name and the two primary data lines and returns a `CoordGeodetic` object representing the position of the object at the time of observation
 - `getTLEFiles()` - Returns the paths to the file that have the .tle extension at the passed directory
+- `parseTLEFile()` - Processes a .tle file and returns a vector of Tle objects
 
 ## Data Ingestion
 Feature uses  `TLEParser` and `SatelliteCoverageTracker` classes to load and process satellite data from TLE files.
