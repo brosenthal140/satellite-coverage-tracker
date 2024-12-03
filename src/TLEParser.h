@@ -6,7 +6,7 @@ using namespace std;
 using namespace libsgp4;
 
 struct TLEParser {
-private: 	
+private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
 
 	/* ========== PRIVATE METHODS ========== */
@@ -25,4 +25,5 @@ public:
 
 	static vector<string> getTLEFiles(const string &directoryPath);
 	static vector<Tle> parseTLEFile(const string& tlePath, bool isThreeLine);
+	static void parseTLEFile(const string& tlePath, vector<Tle> &observations, bool isThreeLine);
 };

@@ -78,6 +78,21 @@ vector<string> getTLEFiles(const string& directoryPath) {
  * @return a vector of Tle objects
  */
 vector<Tle> TLEParser::parseTLEFile(const string& tlePath, bool isThreeLine) {
+	vector<Tle> observations;
+
+	TLEParser::parseTLEFile(tlePath, observations, isThreeLine);
+
+	return observations;
+}
+
+/**
+ * Processes a file and inserts Tle objects into the vector passed as reference
+ * @param tlePath the path to the TLE file
+ * @param observations a reference to the vector where the observations should be inserted
+ * @param isThreeLine indicates if the format is two-line element or three-line element
+ */
+void TLEParser::parseTLEFile(const string& tlePath, vector<Tle> &observations, bool isThreeLine)
+{
 	//------Open checks, to print error if cannot --------//
 	ifstream inFile(tlePath);
 	if (!inFile.is_open()) {
@@ -87,7 +102,6 @@ vector<Tle> TLEParser::parseTLEFile(const string& tlePath, bool isThreeLine) {
 	}
 
 	string tleLine1, tleLine2, tleLine3;
-	vector<Tle> observations;
 	if (isThreeLine)
 	{
 		while (getline(inFile, tleLine1)) {
@@ -104,8 +118,6 @@ vector<Tle> TLEParser::parseTLEFile(const string& tlePath, bool isThreeLine) {
 	}
 
 	inFile.close();
-
-	return observations;
 }
 
 
