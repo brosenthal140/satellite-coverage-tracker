@@ -93,10 +93,18 @@ void Tle::Initialize()
     unsigned int sat_number_1;
     unsigned int sat_number_2;
 
-    ExtractInteger(line_one_.substr(TLE1_COL_NORADNUM,
-                TLE1_LEN_NORADNUM), sat_number_1);
-    ExtractInteger(line_two_.substr(TLE2_COL_NORADNUM,
-                TLE2_LEN_NORADNUM), sat_number_2);
+	// Check to see if either string for the sat number has a 'T' pretended at the beginning
+	std::string satString1, satString2;
+	satString1 = line_one_.substr(TLE1_COL_NORADNUM,TLE1_LEN_NORADNUM);
+	satString2 = line_two_.substr(TLE2_COL_NORADNUM,TLE2_LEN_NORADNUM);
+
+	if (satString1[0] == 'T')
+		satString1 = satString1.substr(1);
+	if (satString2[0] == 'T')
+		satString2 = satString2.substr(1);
+
+    ExtractInteger(satString1, sat_number_1);
+    ExtractInteger(satString2, sat_number_2);
 
     if (sat_number_1 != sat_number_2)
     {
