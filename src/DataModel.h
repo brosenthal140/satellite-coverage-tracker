@@ -13,6 +13,7 @@ class DataModel {
 public:
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
 	explicit DataModel(string &directory);
+	virtual ~DataModel() = 0;
 
 	/* ========== PUBLIC MUTATORS ========== */
 	virtual void import() = 0;

@@ -1,4 +1,5 @@
 #include <cmath>
+#include <sstream>
 #include "Utility.h"
 
 /* ========== PUBLIC CONST MEMBER Variables ========== */
@@ -27,4 +28,23 @@ double Utility::getDistance(const CoordGeodetic &pos1, const CoordGeodetic &pos2
 	double c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
 	return EARTH_RADIUS * c;
+}
+
+/**
+ * Creates a string containing the members of the set
+ * @param set the set to convert to a string
+ * @return a string containing the numbers that were in the set
+ */
+string Utility::toString(const unordered_set<int> &set)
+{
+	ostringstream oss;
+	for (auto it = set.begin(); it != set.end(); ++it)
+	{
+		if (it != set.begin())
+		{
+			oss << ", ";
+		}
+		oss << *it;
+	}
+	return oss.str();
 }

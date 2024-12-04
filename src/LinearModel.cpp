@@ -7,6 +7,7 @@
 /* ---------------------------------------------- */
 /* ========== CONSTRUCTORS/DESTRUCTORS ========== */
 LinearModel::LinearModel(string &dataDirectory) : DataModel(dataDirectory), _dataDirectory(dataDirectory), _observationCount(0) {}
+LinearModel::~LinearModel() {}
 
 /* ========== PUBLIC MUTATORS ========== */
 /**

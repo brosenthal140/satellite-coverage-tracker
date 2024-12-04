@@ -9,21 +9,25 @@ using namespace libsgp4;
 struct SatelliteCoverageTracker {
 public:
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
-	SatelliteCoverageTracker(const string &pathToData, const DateTime &dateTime, const CoordGeodetic &location);
+	SatelliteCoverageTracker(string pathToData, const CoordGeodetic &location, const double &radius);
+	~SatelliteCoverageTracker();
 
-	/* ========== PUBLIC ACCESSORS ========== */
-
-
-	/* ========== PUBLIC MUTATORS ========== */
+	/* ========== PUBLIC STATIC METHODS ========== */
+	static void runCLI();
 
 private:
 	/* ========== PRIVATE MEMBER VARIABLES ========== */
-	string _pathToDataDirectory;
-	DateTime _dateTimeRef;
+	string _dataDirectory;
 	CoordGeodetic _locationRef;
-	DataModel* _dataModel;
+	double _radius;
+	vector<Tle> _observations;
+
+	DataModel* _graphModel;
+	DataModel* _linearModel;
 
 	/* ========== PRIVATE HELPER FUNCTIONS ========== */
 	void _importData();
+	void _initModel(DataModel *model);
+	unordered_set<int> _performSearch(DataModel *model);
 };
 
