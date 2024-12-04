@@ -2,6 +2,8 @@
 #include <string>
 #include "SGP4.h"
 #include "DataModel.h"
+#include "SatelliteCatalog.h"
+
 using namespace std;
 using namespace libsgp4;
 
@@ -21,6 +23,7 @@ private:
 	CoordGeodetic _locationRef;
 	double _radius;
 	vector<Tle> _observations;
+	SatelliteCatalog _catalog;
 
 	DataModel* _graphModel;
 	DataModel* _linearModel;
@@ -28,6 +31,6 @@ private:
 	/* ========== PRIVATE HELPER FUNCTIONS ========== */
 	void _importData();
 	void _initModel(DataModel *model);
-	unordered_set<int> _performSearch(DataModel *model);
+	unordered_set<string> _performSearch(DataModel *model);
 };
 

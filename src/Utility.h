@@ -15,4 +15,5 @@ public:
 	/* ========== PUBLIC STATIC FUNCTIONS ========== */
 	static double getDistance(const CoordGeodetic &pos1, const CoordGeodetic &pos2);
 	static string toString(const unordered_set<int> &set);
+	static string toString(const unordered_set<string> &set);
 };
