@@ -6,6 +6,13 @@ COP3530 Data Structures &amp; Algorithm - Project 3
 **Group Members:** Kamarii Austin, Ryan McGlinn, Brandon Rosenthal
 
 # Start Here
+To run the process you must do the following:
+1. Download a zip of the source code from the repo
+2. Open the project in your IDE of choice, or use a stand-alone version of CMake to compile the project
+   - There are two CMake executables that are defined, but only the one labeled "main" is needed
+3. Run the exe generated from your compiler, and follow the instructions to set up your search
+   - You must set up a data directory and populate it with .tle files and the satellite situation report (SSR) .csv
+   - Sample .tle files and the .csv SSR can be found in the data directory of this repo
 
 # Class Documentation
 The following section provides a summary of each custom class used in the project
@@ -102,13 +109,6 @@ class TLEParser {
 - `getTLEFiles()` - Returns the paths to the file that have the .tle extension at the passed directory
 - `parseTLEFile()` - Processes a .tle file and returns a vector of `Tle` objects
 - - `parseTLEFile()` - Processes a .tle file and inserts `Tle` objects into the vector passed to the function
-
-## Data Ingestion
-Feature uses  `TLEParser` and `SatelliteCoverageTracker` classes to load and process satellite data from TLE files.
-
-### Usage
-1. Place your TLE files in the `data/` directory.
-2. Run the main program to parse and ingest the TLE data.
 
 ## DataModel Class
 This is a template class which both the LinearModel and GraphModel classes inherit from.
