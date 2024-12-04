@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <algorithm>
 #include "SatelliteCoverageTracker.h"
 #include "TLEParser.h"
 #include "GraphModel.h"
@@ -26,6 +27,10 @@ SatelliteCoverageTracker::SatelliteCoverageTracker(string  pathToData, const Coo
 	// Initialize the two models
 	_graphModel = new GraphModel(_dataDirectory);
 	_linearModel = new LinearModel(_dataDirectory);
+
+	// Load the catalog
+	SatelliteCatalog catalog(_dataDirectory);
+	_catalog = catalog;
 }
 
 /**
@@ -103,20 +108,30 @@ void SatelliteCoverageTracker::runCLI()
 	start = chrono::high_resolution_clock::now();
 	auto result = tracker._performSearch(tracker._graphModel);
 	end = chrono::high_resolution_clock::now();
+
+	// Filter the results for starlink satellites
+	unordered_set<string> graphFilteredResults;
+	std::copy_if(result.begin(), result.end(), std::inserter(graphFilteredResults, graphFilteredResults.end()),[] (const string &s) { return s.find("STARLINK") != std::string::npos; });
+
 	graphSearchTime = end - start;
 	cout << "Graph search execution time: " << graphSearchTime.count() << " second(s)" << endl;
-	cout << "Number of satellites that were observed overhead within the radius: " << result.size() << endl;
-	cout << "NORAD satellite category numbers: " << Utility::toString(result) << endl << endl;
+	cout << "Number of StarLink satellites that were observed overhead within the radius: " << graphFilteredResults.size() << endl;
+	cout << "Satellite names: " << Utility::toString(graphFilteredResults) << endl << endl;
 
 	// Perform a search on the linear data model
-	cout << "Performing a search using the graph model..." << endl;
+	cout << "Performing a search using the linear model..." << endl;
 	start = chrono::high_resolution_clock::now();
-	tracker._performSearch(tracker._linearModel);
+	result = tracker._performSearch(tracker._linearModel);
 	end = chrono::high_resolution_clock::now();
+
+	// Filter the results for starlink satellites
+	unordered_set<string> linearFilteredResults;
+	std::copy_if(result.begin(), result.end(), std::inserter(linearFilteredResults, linearFilteredResults.end()),[] (const string &s) { return s.find("STARLINK") != std::string::npos; });
+
 	linearSearchTime = end - start;
 	cout << "Linear search execution time: " << linearSearchTime.count() << " second(s)" << endl << endl;
-	cout << "Number of satellites that were observed overhead within the radius: " << result.size() << endl;
-	cout << "NORAD satellite category numbers: " << Utility::toString(result) << endl << endl;
+	cout << "Number of Starlink satellites that were observed overhead within the radius: " << linearFilteredResults.size() << endl;
+	cout << "Satellite names: " << Utility::toString(linearFilteredResults) << endl << endl;
 
 	// Output some stats
 	cout << "Statistics:" << endl;
@@ -165,9 +180,21 @@ void SatelliteCoverageTracker::_initModel(DataModel *model)
 /**
  * Performs a search using the data model passed to the function
  * @param model the pointer that points to the data model to perform the search with
- * @return an unordered set of NORAD category numbers
+ * @return an unordered set of names associated with the NORAD category numbers returned from the search
  */
-unordered_set<int> SatelliteCoverageTracker::_performSearch(DataModel *model)
+unordered_set<string> SatelliteCoverageTracker::_performSearch(DataModel *model)
 {
-	return model->search(_locationRef, _radius);
+	auto catNums = model->search(_locationRef, _radius);
+
+	unordered_set<string> satNames;
+	string name;
+	for (const auto &catNum : catNums)
+	{
+		auto catEntry = _catalog.getCatalogEntry(catNum);
+		name = catEntry.objectName;
+		if (!name.empty())
+			satNames.insert(name);
+	}
+
+	return satNames;
 }

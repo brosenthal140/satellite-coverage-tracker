@@ -48,3 +48,22 @@ string Utility::toString(const unordered_set<int> &set)
 	}
 	return oss.str();
 }
+
+/**
+ * Creates a string containing the members of the set
+ * @param set the set to convert to a string
+ * @return a string containing the numbers that were in the set
+ */
+string Utility::toString(const unordered_set<string> &set)
+{
+	ostringstream oss;
+	for (auto it = set.begin(); it != set.end(); ++it)
+	{
+		if (it != set.begin())
+		{
+			oss << ", ";
+		}
+		oss << *it;
+	}
+	return oss.str();
+}

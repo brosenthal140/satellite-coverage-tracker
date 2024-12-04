@@ -32,6 +32,7 @@ public:
 	};
 
 	/* ========== CONSTRUCTORS/DESTRUCTORS ========== */
+	SatelliteCatalog() : _directory(""), _count(0) {}
 	explicit SatelliteCatalog(string pathToDataDirectory);
 
 	/* ========== PUBLIC ACCESSORS ========== */
