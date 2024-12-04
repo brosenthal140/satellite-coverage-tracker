@@ -4,6 +4,7 @@
 #include "TLEParser.h"
 #include "GraphModel.h"
 #include "LinearModel.h"
+#include "Utility.h"
 
 using namespace std;
 using namespace libsgp4;
@@ -44,11 +45,12 @@ SatelliteCoverageTracker::~SatelliteCoverageTracker()
 void SatelliteCoverageTracker::runCLI()
 {
 	double latitude, longitude;
+	chrono::duration<double> graphInitTime{}, linearInitTime{}, graphSearchTime{}, linearSearchTime{};
 	string directory, strLongitude, strLatitude, strRadius;
 	cout << "Welcome to the Satellite Coverage Tracker CLI! This process will ask you several questions to get started:" << endl << endl;
 
 	// Get the path to the data directory
-	cout << "This process will require some .tle files that contain two-line elements representing satellite observations and a .csv with the current satellite situation report . These files can be downloaded from space-track.org" << endl;
+	cout << "This process will require some .tle files that contain two-line elements representing satellite observations and a .csv with the current satellite situation report. These files can be downloaded from space-track.org" << endl;
 	cout << "Enter the path to where your data can be found: ";
 	cin >> directory;
 
@@ -77,41 +79,61 @@ void SatelliteCoverageTracker::runCLI()
 	tracker._importData();
 	auto end = chrono::high_resolution_clock::now();
 	chrono::duration<double> elapsed = end - start;
+	cout << tracker._observations.size() << " data points were imported..." << endl;
 	cout << "Import process execution time: " << elapsed.count() << " second(s)" << endl << endl;
 
 	// Init the graph model and output the execution time
-	cout << "Initializing the graph model... This could take several minutes" << endl;
+	cout << "Initializing the graph model..." << endl;
 	start = chrono::high_resolution_clock::now();
 	tracker._initModel(tracker._graphModel);
 	end = chrono::high_resolution_clock::now();
-	elapsed = end - start;
-	cout << "Graph model init execution time: " << elapsed.count() << " second(s)" << endl << endl;
+	graphInitTime = end - start;
+	cout << "Graph model init execution time: " << graphInitTime.count() << " second(s)" << endl << endl;
 
 	// Init the linear model and output the execution time
-	cout << "Initializing the linear model... This could take several minutes" << endl;
+	cout << "Initializing the linear model..." << endl;
 	start = chrono::high_resolution_clock::now();
 	tracker._initModel(tracker._linearModel);
 	end = chrono::high_resolution_clock::now();
-	elapsed = end - start;
-	cout << "Linear model init execution time: " << elapsed.count() << " second(s)" << endl << endl;
+	linearInitTime = end - start;
+	cout << "Linear model init execution time: " << linearInitTime.count() << " second(s)" << endl << endl;
 
 	// Perform a search on the graph data model
 	cout << "Performing a search using the graph model..." << endl;
 	start = chrono::high_resolution_clock::now();
-	tracker._performSearch(tracker._graphModel);
+	auto result = tracker._performSearch(tracker._graphModel);
 	end = chrono::high_resolution_clock::now();
-	elapsed = end - start;
-	cout << "Graph search execution time: " << elapsed.count() << " second(s)" << endl << endl;
-	// TODO: Output information about the graph search
+	graphSearchTime = end - start;
+	cout << "Graph search execution time: " << graphSearchTime.count() << " second(s)" << endl;
+	cout << "Number of satellites that were observed overhead within the radius: " << result.size() << endl;
+	cout << "NORAD satellite category numbers: " << Utility::toString(result) << endl << endl;
 
 	// Perform a search on the linear data model
 	cout << "Performing a search using the graph model..." << endl;
 	start = chrono::high_resolution_clock::now();
 	tracker._performSearch(tracker._linearModel);
 	end = chrono::high_resolution_clock::now();
-	elapsed = end - start;
-	cout << "Linear search execution time: " << elapsed.count() << " second(s)" << endl << endl;
-	// TODO: Output information about the linear search
+	linearSearchTime = end - start;
+	cout << "Linear search execution time: " << linearSearchTime.count() << " second(s)" << endl << endl;
+	cout << "Number of satellites that were observed overhead within the radius: " << result.size() << endl;
+	cout << "NORAD satellite category numbers: " << Utility::toString(result) << endl << endl;
+
+	// Output some stats
+	cout << "Statistics:" << endl;
+	// Init stats
+	double initRatio = graphInitTime / linearInitTime;
+	cout << fixed << setprecision(1) << "Init time difference (graph init time - linear init time): " << (graphInitTime - linearInitTime).count() << " seconds" << endl;
+	cout << fixed << setprecision(1) << "The graph model took " << initRatio << " times longer to initialize than the linear model" << endl << endl;
+
+	// Search stats
+	double searchRatio = linearSearchTime / graphSearchTime;
+	double searchDifMilli = chrono::duration<double, milli>(linearSearchTime - graphSearchTime).count();
+	cout << fixed << setprecision(1) << "Search time difference (linear search time - graph search time in milliseconds): " << searchDifMilli << " milliseconds" << endl;
+	cout << fixed << setprecision(1) << "The linear model took " << searchRatio << " times longer to complete the search than the graph model" << endl << endl;
+
+	// Output num cycles to break even
+	int numCyclesToJustifyInitTime = ceil((graphInitTime - linearInitTime).count() / (linearSearchTime - graphSearchTime) .count());
+	cout << "After " << numCyclesToJustifyInitTime << " searches the graph model will begin to outperform the linear model in terms of total execution time required" << endl;
 }
 
 /* =============== PRIVATE METHODS =============== */

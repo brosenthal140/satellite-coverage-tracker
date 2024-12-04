@@ -59,7 +59,7 @@ private:
 
 	map<int, vector<Edge>> _wpAdjList;
 	unordered_set<int> _waypoints;
-	double _wpSeparation = 2000; // units: kilometers
+	double _wpSeparation = 10000; // units: kilometers
 	int _wpCount;
 
 	/* ========== PRIVATE INSERTION METHODS ========== */
